@@ -1,0 +1,246 @@
+﻿@inherits LayoutComponentBase
+
+<div class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="w-full container mx-auto px-4 sm:px-2 md:px-14 max-w-[1440px]">
+            <div class="flex h-20 items-center justify-between">
+
+                <!-- Logo -->
+                <NavLink href="/" class="flex items-center gap-2">
+                    <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                        <span class="text-primary-foreground font-bold text-lg">C</span>
+                    </div>
+
+                    <div class="flex flex-col leading-none">
+                        <span class="text-xl font-semibold">
+                            <span class="text-primary">Comfy</span>
+                            <span class="text-accent">Life</span>
+                        </span>
+
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-primary/60 font-bold mt-1">
+                            BnB Boutique
+                        </span>
+                    </div>
+                </NavLink>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center gap-10">
+                    <NavLink href="/" Match="NavLinkMatch.All" class="nav-link">
+                        Home
+                    </NavLink>
+
+                    <NavLink href="/apartments" class="nav-link">
+                        Apartments
+                    </NavLink>
+
+                    <NavLink href="/amenities" class="nav-link">
+                        Amenities
+                    </NavLink>
+
+                    <NavLink href="/about" class="nav-link">
+                        About
+                    </NavLink>
+
+                    <NavLink href="/contact" class="nav-link">
+                        Contact
+                    </NavLink>
+                </div>
+
+                <!-- CTA -->
+                <div class="hidden lg:flex items-center gap-4">
+                    <a href="tel:+1234567890"
+                       class="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>+1 (234) 567-890</span>
+                    </a>
+
+                    <NavLink href="/booking"
+                             class="bg-accent text-accent-foreground px-5 py-2 rounded-md hover:bg-accent/90 transition">
+                        Book Now
+                    </NavLink>
+                </div>
+
+                <!-- Mobile Button -->
+                <button class="lg:hidden p-2" @onclick="ToggleMenu">
+                    @if (mobileMenuOpen)
+                    {
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    }
+                </button>
+            </div>
+
+            @if (mobileMenuOpen)
+            {
+                <div class="lg:hidden py-4 border-t border-border">
+                    <div class="flex flex-col gap-4">
+
+                        <NavLink href="/" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            Home
+                        </NavLink>
+
+                        <NavLink href="/apartments" @onclick="CloseMenu">
+                            Apartments
+                        </NavLink>
+
+                        <NavLink href="/amenities" @onclick="CloseMenu">
+                            Amenities
+                        </NavLink>
+
+                        <NavLink href="/about" @onclick="CloseMenu">
+                            About
+                        </NavLink>
+
+                        <NavLink href="/contact" @onclick="CloseMenu">
+                            Contact
+                        </NavLink>
+
+                        <NavLink href="/booking" @onclick="CloseMenu"
+                                 class="bg-accent text-accent-foreground px-4 py-2 rounded-md text-center">
+                            Book Now
+                        </NavLink>
+                    </div>
+                </div>
+            }
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        @Body
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-16">
+        <div class="w-full container mx-auto px-4 sm:px-2 md:px-14 max-w-[1440px]">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="h-10 w-10 rounded-full bg-amber-500 flex items-center justify-center">
+                            <span class="font-bold">C</span>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-semibold">ComfyLife</h3>
+                            <p class="text-xs uppercase tracking-widest text-gray-400">
+                                BnB Boutique
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-400 text-sm">
+                        A boutique residence shaped around the rituals of slow living and refined hospitality.
+                    </p>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="uppercase tracking-widest text-xs text-amber-400 mb-5">
+                        Explore
+                    </h4>
+
+                    <ul class="space-y-3">
+                        <li>
+                            <NavLink href="/">Home</NavLink>
+                        </li>
+                        <li>
+                            <NavLink href="/apartments">Apartments</NavLink>
+                        </li>
+                        <li>
+                            <NavLink href="/amenities">Amenities</NavLink>
+                        </li>
+                        <li>
+                            <NavLink href="/about">About</NavLink>
+                        </li>
+                        <li>
+                            <NavLink href="/contact">Contact</NavLink>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="uppercase tracking-widest text-xs text-amber-400 mb-5">
+                        Contact
+                    </h4>
+
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li>
+                            <i class="fa-solid fa-location-dot mr-2"></i>
+                            Nairobi, Kenya
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-phone mr-2"></i>
+                            +254 700 000 000
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-envelope mr-2"></i>
+                            info@comfylife.com
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Hours -->
+                <div>
+                    <h4 class="uppercase tracking-widest text-xs text-amber-400 mb-5">
+                        Office Hours
+                    </h4>
+
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li class="flex justify-between">
+                            <span>Mon - Fri</span>
+                            <span>9 AM - 6 PM</span>
+                        </li>
+
+                        <li class="flex justify-between">
+                            <span>Saturday</span>
+                            <span>10 AM - 4 PM</span>
+                        </li>
+
+                        <li class="flex justify-between">
+                            <span>Sunday</span>
+                            <span>Appointment</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="border-t border-white/10 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-xs text-gray-500">
+                    © @DateTime.Now.Year ComfyLife BnB. All rights reserved.
+                </p>
+
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <NavLink href="/privacy">Privacy</NavLink>
+                    <NavLink href="/terms">Terms</NavLink>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+@code {
+    private bool mobileMenuOpen;
+
+    private void ToggleMenu()
+    {
+        mobileMenuOpen = !mobileMenuOpen;
+    }
+
+    private void CloseMenu()
+    {
+        mobileMenuOpen = false;
+    }
+}

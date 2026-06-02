@@ -1,0 +1,291 @@
+﻿@page "/"
+
+<div>
+    <!-- Hero -->
+    <section class="relative bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+
+                <div class="lg:col-span-5 space-y-8 animate-fade-up">
+                    <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+                        <span class="h-px w-10 bg-accent"></span>
+                        Kilimani, Nairobi • @TotalListings Curated Stays
+                    </div>
+
+                    <h1 class="font-heading text-6xl lg:text-7xl xl:text-8xl leading-[0.9] text-primary">
+                        Your Perfect <br />
+                        <span class="italic text-accent">Getaway</span> <br />
+                        Awaits
+                    </h1>
+
+                    <p class="text-lg leading-relaxed text-foreground/70 max-w-md">
+                        Fully furnished, design-forward apartments in the heart of Kilimani.
+                        Book by the night or by the month.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <NavLink href="/booking" class="btn-gold rounded-sm uppercase tracking-widest text-xs font-bold px-10 py-4">
+                            Book Your Stay <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </NavLink>
+
+                        <NavLink href="/apartments" class="inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold px-10 py-4 border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                            Explore Listings
+                        </NavLink>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 relative grid grid-cols-12 grid-rows-6 gap-4 h-[480px] lg:h-[620px]">
+                    <div class="col-span-8 row-span-6 overflow-hidden rounded-sm shadow-2xl">
+                        <img src="images/hero-golf-resort.jpg" alt="ComfyLife apartment interior" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="col-span-4 row-span-3 overflow-hidden rounded-sm shadow-xl mt-8">
+                        <img src="images/amenity-pool.jpg" alt="Pool view" class="w-full h-full object-cover" />
+                    </div>
+
+                    <div class="col-span-4 row-span-3 overflow-hidden rounded-sm shadow-xl bg-primary text-primary-foreground flex flex-col items-center justify-center text-center p-6">
+                        <span class="font-heading text-5xl text-accent">@TotalListings</span>
+                        <span class="text-[10px] uppercase tracking-[0.2em] mt-2 opacity-70 leading-tight">
+                            Boutique Stays<br />Available
+                        </span>
+                    </div>
+
+                    <div class="hidden lg:flex absolute -left-8 -bottom-8 w-28 h-28 bg-card rounded-full items-center justify-center text-center p-4 shadow-2xl border border-border">
+                        <div>
+                            <p class="font-heading text-[11px] uppercase tracking-tight leading-tight">UN Approved</p>
+                            <p class="text-accent text-xs mt-1">★★★★★</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simple Search Bar -->
+            <div class="mt-12 lg:mt-16 bg-card border border-border shadow-elegant p-6 grid md:grid-cols-4 gap-4">
+                <input type="date" class="px-4 py-3 border border-border bg-background outline-none" />
+                <input type="date" class="px-4 py-3 border border-border bg-background outline-none" />
+                <select class="px-4 py-3 border border-border bg-background outline-none">
+                    <option>1 Guest</option>
+                    <option>2 Guests</option>
+                    <option>3 Guests</option>
+                    <option>4 Guests</option>
+                </select>
+                <NavLink href="/apartments" class="btn-gold">
+                    Search Stays
+                </NavLink>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-20 bg-muted/60 border-y border-border">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
+            @foreach (var feature in Features)
+            {
+                <div class="flex flex-col items-center animate-fade-up">
+                    <div class="w-14 h-14 mb-5 bg-background rounded-full flex items-center justify-center shadow-soft border border-border">
+                        <i class="@feature.Icon text-primary"></i>
+                    </div>
+                    <h4 class="font-heading text-xl text-foreground">@feature.Title</h4>
+                    <p class="text-xs text-muted-foreground mt-1">@feature.Description</p>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Listings -->
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-6">
+                <div>
+                    <h2 class="font-heading text-5xl text-primary mb-3">Our Listings</h2>
+                    <p class="text-muted-foreground max-w-lg">
+                        @TotalListings fully furnished apartments in Kilimani — book by the night or by the month.
+                    </p>
+                </div>
+
+                <NavLink href="/apartments" class="border-b-2 border-accent text-xs uppercase tracking-widest font-bold pb-1 self-start md:self-end hover:text-accent transition-colors">
+                    View All Listings
+                </NavLink>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                @foreach (var apartment in Apartments)
+                {
+                    <NavLink href="@($"/apartments/{apartment.Id}")" class="group block animate-fade-up">
+                        <div class="relative overflow-hidden mb-6 aspect-[4/5] rounded-sm">
+                            <img src="@apartment.Image" alt="@apartment.Name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+
+                            <div class="absolute top-4 left-4 flex gap-2">
+                                <span class="bg-background/90 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground">
+                                    @apartment.Bedrooms Bed
+                                </span>
+
+                                <span class="bg-accent text-accent-foreground px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                                    KES @apartment.NightlyRate.ToString("N0")/nt
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-heading text-2xl text-foreground">@apartment.Name</h3>
+                                <p class="text-[10px] uppercase tracking-widest text-accent font-bold mt-1">
+                                    @apartment.Tagline
+                                </p>
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0 text-primary"></i>
+                        </div>
+
+                        <div class="flex items-center gap-4 text-xs text-muted-foreground border-t border-border pt-4 mt-4">
+                            <span>
+                                <i class="fa-solid fa-location-dot mr-1"></i>
+                                @apartment.Location
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-users mr-1"></i>
+                                Max @apartment.MaxGuests
+                            </span>
+                        </div>
+                    </NavLink>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Availability -->
+    <section class="py-24 bg-muted">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Live Status</p>
+                <h2 class="font-heading text-4xl lg:text-5xl text-primary mb-4">Check Availability</h2>
+                <p class="text-muted-foreground">
+                    Select a listing and pick your dates to see what's open.
+                </p>
+            </div>
+
+            <div class="bg-card border border-border shadow-elegant p-6 rounded-sm grid md:grid-cols-3 gap-4">
+                <select class="px-4 py-3 border border-border bg-background outline-none">
+                    @foreach (var apartment in Apartments)
+                    {
+                        <option>@apartment.Name</option>
+                    }
+                </select>
+
+                <input type="date" class="px-4 py-3 border border-border bg-background outline-none" />
+                <button class="btn-gold">Check</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story -->
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-6">
+                <h2 class="font-heading text-5xl text-primary">A home, not a hotel.</h2>
+
+                <p class="text-muted-foreground leading-relaxed">
+                    Every apartment is fully furnished with fitted kitchens, fast WiFi, Smart TVs with Netflix,
+                    laundry areas and spacious balconies — all backed by 24/7 security, borehole water and
+                    power backup.
+                </p>
+
+                <ul class="space-y-3">
+                    @foreach (var item in Amenities)
+                    {
+                        <li class="flex items-center gap-3 text-foreground">
+                            <div class="h-2 w-2 rounded-full bg-accent"></div>
+                            @item
+                        </li>
+                    }
+                </ul>
+
+                <NavLink href="/amenities" class="btn-gold rounded-sm uppercase tracking-widest text-xs font-bold">
+                    Explore Amenities <i class="fa-solid fa-arrow-right ml-2"></i>
+                </NavLink>
+            </div>
+
+            <div class="relative">
+                <img src="images/amenity-pool.jpg" alt="Apartment lifestyle" class="rounded-sm shadow-elegant w-full h-[480px] object-cover" />
+
+                <div class="absolute -bottom-6 -left-6 bg-card p-6 rounded-sm shadow-elegant max-w-xs hidden lg:block border border-border">
+                    <div class="flex items-center gap-1 mb-2 text-accent">
+                        ★★★★★
+                    </div>
+
+                    <p class="text-sm text-muted-foreground italic">
+                        "Spotless, stylish and so well located. Felt like home from the first night."
+                    </p>
+
+                    <p class="text-sm font-medium text-foreground mt-2">— Recent Guest</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-32 bg-primary text-primary-foreground text-center">
+        <div class="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 class="font-heading text-6xl mb-8">
+                Ready to Experience <span class="italic text-accent">Kilimani</span>?
+            </h2>
+
+            <p class="opacity-80 text-lg mb-12">
+                Secure your dates and step into a fully furnished home in the city's most connected neighbourhood.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <NavLink href="/booking" class="btn-gold rounded-sm uppercase tracking-widest text-xs font-bold px-12 py-4">
+                    Secure Your Stay
+                </NavLink>
+
+                <NavLink href="/contact" class="inline-flex items-center justify-center rounded-sm border border-primary-foreground/40 px-12 py-4 text-xs font-bold uppercase tracking-widest hover:bg-primary-foreground hover:text-primary transition-colors">
+                    Request Information
+                </NavLink>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    private int TotalListings => Apartments.Count;
+
+    private List<FeatureItem> Features = new()
+    {
+        new("fa-solid fa-location-dot", "Prime Kilimani", "Walk to malls, eateries and embassies."),
+        new("fa-solid fa-wifi", "Fast WiFi & Smart TVs", "Stream on Netflix-ready Smart TVs."),
+        new("fa-solid fa-sparkles", "Fully Furnished", "Move-in ready, fitted kitchens, laundry."),
+        new("fa-solid fa-shield-halved", "24/7 Security", "CCTV, intercom, electric fence.")
+    };
+
+    private List<ApartmentItem> Apartments = new()
+    {
+        new(1, "Executive One Bedroom", "Stylish city comfort", "images/hero-golf-resort.jpg", 1, 6500, "Kilimani", 2),
+        new(2, "Deluxe Two Bedroom", "Spacious modern living", "images/amenity-pool.jpg", 2, 9500, "Kilimani", 4),
+        new(3, "Premium Three Bedroom", "Elegant family stay", "images/hero-golf-resort.jpg", 3, 13500, "Kilimani", 6)
+    };
+
+    private List<string> Amenities = new()
+    {
+        "Fully Equipped Gym",
+        "Open-Plan Fitted Kitchen",
+        "Solar / Backup Water Heating",
+        "Private Parking",
+        "Rooftop Grill",
+        "Spacious Balconies"
+    };
+
+    private record FeatureItem(string Icon, string Title, string Description);
+
+    private record ApartmentItem(
+        int Id,
+        string Name,
+        string Tagline,
+        string Image,
+        int Bedrooms,
+        int NightlyRate,
+        string Location,
+        int MaxGuests
+    );
+}

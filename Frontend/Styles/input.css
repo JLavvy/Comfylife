@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@source "../**/*.razor";
+
+@theme {
+  --color-background: #E8CBBA;
+  --color-foreground: #040404;
+
+  --color-primary: #747862;
+  --color-primary-foreground: #FFFFFF;
+
+  --color-accent: #F5A684;
+  --color-accent-foreground: #040404;
+
+  --color-muted: #E8CBBA;
+  --color-muted-foreground: #6D6E70;
+
+  --color-border: #D8D0CA;
+  --color-card: #F2E4DA;
+
+  --font-heading: "DM Serif Display", Georgia, serif;
+  --font-body: "Fira Sans", system-ui, sans-serif;
+
+  --shadow-soft: 0 4px 20px -4px rgba(4, 4, 4, 0.08);
+  --shadow-elegant: 0 10px 40px -10px rgba(4, 4, 4, 0.15);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-xs uppercase tracking-widest font-semibold text-muted-foreground hover:text-primary transition-colors;
+  }
+
+  .nav-link.active {
+    @apply text-primary;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #F5A684, #E8CBBA);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, rgba(116, 120, 98, 0.9), rgba(116, 120, 98, 0.7));
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
