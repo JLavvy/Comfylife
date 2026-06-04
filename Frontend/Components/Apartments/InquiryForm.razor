@@ -1,0 +1,35 @@
+<div class="border border-border bg-card p-6 shadow-soft">
+    <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-4">
+        Make an inquiry
+    </p>
+
+    <h3 class="font-heading text-2xl text-primary mb-6">
+        Ask about @ApartmentName
+    </h3>
+
+    <form class="space-y-4">
+        <input type="text"
+               placeholder="Your name"
+               class="w-full px-4 py-3 border border-border bg-background outline-none" />
+
+        <input type="email"
+               placeholder="Email address"
+               class="w-full px-4 py-3 border border-border bg-background outline-none" />
+
+        <input type="tel"
+               placeholder="Phone number"
+               class="w-full px-4 py-3 border border-border bg-background outline-none" />
+
+        <textarea placeholder="Message"
+                  rows="4"
+                  class="w-full px-4 py-3 border border-border bg-background outline-none resize-none"></textarea>
+
+        <button type="submit" class="btn-gold w-full">
+            Send Inquiry
+        </button>
+    </form>
+</div>
+
+@code {
+    [Parameter] public string ApartmentName { get; set; } = "";
+}

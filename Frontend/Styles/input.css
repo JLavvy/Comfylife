@@ -3,20 +3,21 @@
 @source "../**/*.razor";
 
 @theme {
-  --color-background: #E8CBBA;
-  --color-foreground: #040404;
 
-  --color-primary: #747862;
-  --color-primary-foreground: #FFFFFF;
+  --color-background: #E8CBBA; /* light-beige */
+  --color-foreground: #040404; /*Black*/
 
-  --color-accent: #F5A684;
-  --color-accent-foreground: #040404;
+  --color-primary: #747862; /*Olive Green*/
+  --color-primary-foreground: #FFFFFF; /*White*/
 
-  --color-muted: #E8CBBA;
-  --color-muted-foreground: #6D6E70;
+  --color-accent: #F5A684; /*Peach Coral */
+  --color-accent-foreground: #040404; /*Black*/
 
-  --color-border: #D8D0CA;
-  --color-card: #F2E4DA;
+  --color-muted: #E8CBBA; /* light-beige */
+  --color-muted-foreground: #6D6E70;/* dark-gray */
+
+  --color-border: #D8D0CA; /* light-gray */
+  --color-card: #F2E4DA; /* light-pink */
 
   --font-heading: "DM Serif Display", Georgia, serif;
   --font-body: "Fira Sans", system-ui, sans-serif;
@@ -28,12 +29,6 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-  }
-
-  body {
-    background: var(--color-background);
-    color: var(--color-foreground);
-    font-family: var(--font-body);
   }
 
   h1,

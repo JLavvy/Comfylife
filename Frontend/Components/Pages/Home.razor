@@ -1,5 +1,6 @@
 ﻿@page "/"
 
+<PageTitle>ComfyLife | Where Comfort Meets Luxury</PageTitle>
 <div>
     <!-- Hero -->
     <section class="relative bg-white overflow-hidden">
@@ -36,11 +37,11 @@
 
                 <div class="lg:col-span-7 relative grid grid-cols-12 grid-rows-6 gap-4 h-[480px] lg:h-[620px]">
                     <div class="col-span-8 row-span-6 overflow-hidden rounded-sm shadow-2xl">
-                        <img src="images/hero-golf-resort.jpg" alt="ComfyLife apartment interior" class="w-full h-full object-cover" />
+                        <img src="images/Dream/rooftop.jpeg" alt="ComfyLife apartment interior" class="w-full h-full object-cover" />
                     </div>
 
                     <div class="col-span-4 row-span-3 overflow-hidden rounded-sm shadow-xl mt-8">
-                        <img src="images/amenity-pool.jpg" alt="Pool view" class="w-full h-full object-cover" />
+                        <img src="images/Dream/balcony.jpeg" alt="Pool view" class="w-full h-full object-cover" />
                     </div>
 
                     <div class="col-span-4 row-span-3 overflow-hidden rounded-sm shadow-xl bg-primary text-primary-foreground flex flex-col items-center justify-center text-center p-6">
@@ -69,7 +70,7 @@
                     <option>3 Guests</option>
                     <option>4 Guests</option>
                 </select>
-                <NavLink href="/apartments" class="btn-gold">
+                <NavLink href="/searchresults" class="btn-gold">
                     Search Stays
                 </NavLink>
             </div>
@@ -77,23 +78,23 @@
     </section>
 
     <!-- Features -->
-    <section class="py-20 bg-muted/60 border-y border-border">
+    <section class="py-20 bg-card border-y border-border">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
             @foreach (var feature in Features)
             {
                 <div class="flex flex-col items-center animate-fade-up">
-                    <div class="w-14 h-14 mb-5 bg-background rounded-full flex items-center justify-center shadow-soft border border-border">
+                    <div class="w-14 h-14 mb-5 bg-white rounded-full flex items-center justify-center shadow-soft border border-border">
                         <i class="@feature.Icon text-primary"></i>
                     </div>
-                    <h4 class="font-heading text-xl text-foreground">@feature.Title</h4>
-                    <p class="text-xs text-muted-foreground mt-1">@feature.Description</p>
+                    <h4 class="font-heading font-semibold text-xl text-foreground">@feature.Title</h4>
+                    <p class="text-xs font-body text-muted-foreground mt-1">@feature.Description</p>
                 </div>
             }
         </div>
     </section>
 
     <!-- Listings -->
-    <section class="py-24">
+    <section class="py-24 bg-white">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-6">
                 <div>
@@ -128,7 +129,7 @@
 
                         <div class="flex justify-between items-start">
                             <div>
-                                <h3 class="font-heading text-2xl text-foreground">@apartment.Name</h3>
+                                <h3 class="font-heading text-xl font-semibold text-foreground">@apartment.Name</h3>
                                 <p class="text-[10px] uppercase tracking-widest text-accent font-bold mt-1">
                                     @apartment.Tagline
                                 </p>
@@ -137,7 +138,7 @@
                             <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0 text-primary"></i>
                         </div>
 
-                        <div class="flex items-center gap-4 text-xs text-muted-foreground border-t border-border pt-4 mt-4">
+                        <div class="flex items-center gap-4 text-xs font-body text-muted-foreground border-t border-border pt-4 mt-4">
                             <span>
                                 <i class="fa-solid fa-location-dot mr-1"></i>
                                 @apartment.Location
@@ -180,7 +181,7 @@
     </section>
 
     <!-- Story -->
-    <section class="py-24">
+    <section class="py-24 bg-white">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
             <div class="space-y-6">
                 <h2 class="font-heading text-5xl text-primary">A home, not a hotel.</h2>
@@ -207,7 +208,7 @@
             </div>
 
             <div class="relative">
-                <img src="images/amenity-pool.jpg" alt="Apartment lifestyle" class="rounded-sm shadow-elegant w-full h-[480px] object-cover" />
+                <img src="images/Dream/rooftop.jpeg" alt="Apartment lifestyle" class="rounded-sm shadow-elegant w-full h-[480px] object-cover" />
 
                 <div class="absolute -bottom-6 -left-6 bg-card p-6 rounded-sm shadow-elegant max-w-xs hidden lg:block border border-border">
                     <div class="flex items-center gap-1 mb-2 text-accent">
@@ -255,15 +256,15 @@
     {
         new("fa-solid fa-location-dot", "Prime Kilimani", "Walk to malls, eateries and embassies."),
         new("fa-solid fa-wifi", "Fast WiFi & Smart TVs", "Stream on Netflix-ready Smart TVs."),
-        new("fa-solid fa-sparkles", "Fully Furnished", "Move-in ready, fitted kitchens, laundry."),
+        new("fa-solid fa-star", "Fully Furnished", "Move-in ready, fitted kitchens, laundry."),
         new("fa-solid fa-shield-halved", "24/7 Security", "CCTV, intercom, electric fence.")
     };
 
     private List<ApartmentItem> Apartments = new()
     {
-        new(1, "Executive One Bedroom", "Stylish city comfort", "images/hero-golf-resort.jpg", 1, 6500, "Kilimani", 2),
-        new(2, "Deluxe Two Bedroom", "Spacious modern living", "images/amenity-pool.jpg", 2, 9500, "Kilimani", 4),
-        new(3, "Premium Three Bedroom", "Elegant family stay", "images/hero-golf-resort.jpg", 3, 13500, "Kilimani", 6)
+        new(1, "Prince House", "ELEGANT 2-BEDROOM .7TH FLOOR", "images/Dream/rooftop.jpeg", 2, 6500, "Denis Pritt Road,Kilimani", 4),
+        new(2, "Dream House", "MODERN 2-BEDROOM .2ND FLOOR", "images/Dream/balcony.jpeg", 2, 9500, "Denis Pritt Road,Kilimani", 4),
+        new(3, "Ndovu House", "EXECUTIVE 3-BEDROOM .7TH FLOOR", "images/Dream/rooftop.jpeg", 3, 13500, "Kindaruma Road,Kilimani", 6)
     };
 
     private List<string> Amenities = new()

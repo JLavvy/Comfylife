@@ -1,0 +1,104 @@
+@page "/amenities"
+@using Comfylife.Frontend.Models
+@using Comfylife.Frontend.Data
+
+<PageHero Eyebrow="The Experience" Title="Amenities & Facilities" Highlight="Facilities"
+          Description="Every apartment is fully furnished and backed by building-wide amenities designed for comfortable, secure stays." />
+
+<section class="py-0">
+    <div class="grid lg:grid-cols-12">
+        <div class="lg:col-span-7 aspect-[16/9] lg:aspect-auto">
+            <img src="/images/Dream/rooftop.jpeg" alt="Apartment lifestyle" class="w-full h-full object-cover" />
+        </div>
+
+        <div class="lg:col-span-5 bg-primary text-primary-foreground flex items-center justify-end">
+
+            <div class="max-w-md px-8 lg:px-12 mr-12 lg:mr-24 border border-red">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-6">
+                    Signature
+                </p>
+
+                <h2 class="font-heading text-5xl lg:text-6xl mb-8 leading-none">
+                    Move-in <span class="italic text-accent">Ready</span>
+                </h2>
+
+                <p class="opacity-80 leading-relaxed mb-10 text-lg">
+                    From fitted kitchens and fast WiFi to Smart TVs with Netflix and on-site gyms,
+                    every apartment is set up so you can settle in the moment you arrive.
+                </p>
+
+                <a href="/booking"
+                   class="inline-flex items-center justify-center px-6 py-4 text-xs font-bold uppercase tracking-widest rounded-sm bg-accent text-primary hover:bg-accent/90 transition">
+                    Book Your Stay
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Amenities -->
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                    The Full List
+                </p>
+
+                <h2 class="font-heading text-4xl lg:text-5xl text-primary">
+                    All Amenities
+                </h2>
+            </div>
+
+            <p class="text-sm text-muted-foreground max-w-md">
+                Everything you need for a comfortable, considered stay in Kilimani.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 border-t border-l border-border">
+            @foreach (var item in AmenityData.Amenities.Select((amenity, index) => new { amenity, index }))
+            {
+                <div @key="item.amenity.Title"
+                     class="border-r border-border p-20 lg:p-22 min-h-[420px] flex items-start hover:bg-primary/40 transition-colors">
+
+                    <div class="flex items-start gap-5">
+                        <i class="@($"{item.amenity.Icon} text-accent text-3xl shrink-0 mt-1")"></i>
+
+                        <div>
+                            <h3 class="font-heading text-2xl text-primary mb-3">
+                                @item.amenity.Title
+                            </h3>
+
+                            <p class="text-base text-muted-foreground leading-relaxed">
+                                @item.amenity.Description
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-32 bg-primary text-primary-foreground text-center">
+    <div class="max-w-3xl mx-auto px-6">
+        <h2 class="font-heading text-5xl lg:text-6xl mb-6">
+            Ready to <span class="italic text-accent">settle in</span>?
+        </h2>
+
+        <p class="opacity-80 mb-10">
+            Book your apartment and enjoy a fully equipped home from day one.
+        </p>
+
+        <a href="/booking"
+           class="inline-flex rounded-sm uppercase tracking-widest text-xs font-bold px-6 py-4 bg-accent text-primary hover:bg-accent/90 transition">
+            Book Your Stay
+        </a>
+    </div>
+</section>
+
+@code {
+
+  
+}

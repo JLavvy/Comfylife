@@ -32,3 +32,4 @@ C:\Users\lavog\OneDrive\Documents\GitHub\Comfylife\Frontend\obj\Debug\net8.0\Com
 C:\Users\lavog\OneDrive\Documents\GitHub\Comfylife\Frontend\obj\Debug\net8.0\ref\Comfylife.Frontend.dll
 C:\Users\lavog\OneDrive\Documents\GitHub\Comfylife\Frontend\bin\Debug\net8.0\package-lock.json
 C:\Users\lavog\OneDrive\Documents\GitHub\Comfylife\Frontend\bin\Debug\net8.0\package.json
+C:\Users\lavog\OneDrive\Documents\GitHub\Comfylife\Frontend\obj\Debug\net8.0\Comfylife.Frontend.sourcelink.json
