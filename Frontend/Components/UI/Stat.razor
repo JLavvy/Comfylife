@@ -1,0 +1,16 @@
+<div class="bg-background flex flex-col items-start gap-1 p-5">
+    <div class="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+        <i class="@($"{Icon} h-3.5 w-3.5 text-accent")"></i>
+        @Label
+    </div>
+
+    <span class="font-heading text-lg text-primary">
+        @Value
+    </span>
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "";
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string Value { get; set; } = "";
+}

@@ -4,17 +4,16 @@
 
 @theme {
 
-  --color-background: #E8CBBA; /* light-beige */
-  --color-foreground: #040404; /*Black*/
+
 
   --color-primary: #747862; /*Olive Green*/
-  --color-primary-foreground: #FFFFFF; /*White*/
+  --color-primary-fg: #FFFFFF; /*White*/
 
   --color-accent: #F5A684; /*Peach Coral */
-  --color-accent-foreground: #040404; /*Black*/
+  --color-accent-fg: #040404; /*Black*/
 
   --color-muted: #E8CBBA; /* light-beige */
-  --color-muted-foreground: #6D6E70;/* dark-gray */
+  --color-muted-fg: #6D6E70;/* dark-gray */
 
   --color-border: #D8D0CA; /* light-gray */
   --color-card: #F2E4DA; /* light-pink */

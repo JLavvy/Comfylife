@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Models
 
 <PageTitle>ComfyLife | Where Comfort Meets Luxury</PageTitle>
 <div>
@@ -260,12 +262,7 @@
         new("fa-solid fa-shield-halved", "24/7 Security", "CCTV, intercom, electric fence.")
     };
 
-    private List<ApartmentItem> Apartments = new()
-    {
-        new(1, "Prince House", "ELEGANT 2-BEDROOM .7TH FLOOR", "images/Dream/rooftop.jpeg", 2, 6500, "Denis Pritt Road,Kilimani", 4),
-        new(2, "Dream House", "MODERN 2-BEDROOM .2ND FLOOR", "images/Dream/balcony.jpeg", 2, 9500, "Denis Pritt Road,Kilimani", 4),
-        new(3, "Ndovu House", "EXECUTIVE 3-BEDROOM .7TH FLOOR", "images/Dream/rooftop.jpeg", 3, 13500, "Kindaruma Road,Kilimani", 6)
-    };
+    private List<ApartmentListing> Apartments => ApartmentData.Apartments;
 
     private List<string> Amenities = new()
     {

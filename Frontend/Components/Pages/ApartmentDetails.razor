@@ -1,0 +1,256 @@
+@page "/apartments/{Id:int}"
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Models
+
+@if (Apartment is null)
+{
+    <div class="min-h-[60vh] flex items-center justify-center">
+        <div class="text-center">
+            <h1 class="font-heading text-3xl text-primary mb-6">Apartment Not Found</h1>
+
+            <a href="/apartments"
+               class="inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 transition">
+                View All Apartments
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="bg-white">
+        <!-- Breadcrumb + Editorial Title -->
+        <div class="bg-muted/30 border-b border-border">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-14 lg:py-20">
+
+                <nav
+                    class="flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-12">
+                    <a href="/" class="hover:text-accent transition-colors">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                    <a href="/apartments" class="hover:text-accent transition-colors">Apartments</a>
+                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                    <span class="text-accent">@Apartment.Name</span>
+                </nav>
+
+                <div class="grid lg:grid-cols-12 gap-10 items-end">
+                    <div class="lg:col-span-8">
+                        <div
+                            class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.45em] text-accent mb-8">
+                            <span class="h-px w-12 bg-accent"></span>
+                            @Apartment.Tagline
+                        </div>
+
+                        <h1 class="font-heading text-6xl lg:text-8xl text-primary leading-[0.9] mb-6">
+                            @Apartment.Name
+                        </h1>
+
+                        <p class="flex items-center gap-2 text-sm text-muted-foreground">
+                            <i class="fa-solid fa-location-dot text-accent"></i>
+                            @Apartment.Location • @Apartment.Size • @Apartment.Floor
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-4 lg:text-right pb-4">
+                        <p class="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+                            Per Night
+                        </p>
+
+                        <div class="font-heading text-5xl lg:text-6xl text-primary leading-none">
+                            KES @Apartment.NightlyRate.ToString("N0")
+                            <span class="text-sm text-muted-foreground font-body">/night</span>
+                        </div>
+
+                        <p class="text-xs text-muted-foreground mt-3">
+                            or KES @Apartment.MonthlyRate.ToString("N0")/month
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Image -->
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-10">
+            <div class="relative rounded-sm overflow-hidden bg-secondary aspect-[16/9] max-h-[600px]">
+                <img src="@Apartment.Image" alt="@Apartment.Name" class="w-full h-full object-cover" />
+            </div>
+
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-3 mt-3">
+                @for (var i = 0; i < 6; i++)
+                {
+                    var imageNumber = i + 1;
+
+                    <button
+                        class="aspect-[4/3] rounded-sm overflow-hidden border border-border hover:border-accent transition-colors"
+                        aria-label="@($"View image {imageNumber}")">
+                        <img src="@Apartment.Image" alt="" class="w-full h-full object-cover" loading="lazy" />
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Body -->
+        <section class="py-20">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid lg:grid-cols-3 gap-12">
+                    <div class="lg:col-span-2 space-y-16">
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-px bg-border border border-border">
+                            <Stat Icon="fa-solid fa-users" Label="Guests" Value="@Apartment.MaxGuests.ToString()" />
+                            <Stat Icon="fa-solid fa-bed" Label="Beds" Value="@Apartment.Beds" />
+                            <Stat Icon="fa-solid fa-bath" Label="Baths" Value="@Apartment.Bathrooms.ToString()" />
+                            <Stat Icon="fa-solid fa-expand" Label="Size" Value="@Apartment.Size" />
+                            <Stat Icon="fa-solid fa-building" Label="Floor" Value="@Apartment.Floor" />
+                        </div>
+
+                        <!-- About -->
+                        <section>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                                Overview
+                            </p>
+
+                            <h2 class="font-heading text-4xl text-primary mb-6 leading-tight">
+                                About this <span class="italic">apartment</span>
+                            </h2>
+
+                            <p class="text-foreground/70 leading-relaxed text-lg">
+                                @Apartment.LongDescription
+                            </p>
+                        </section>
+
+                        <!-- Amenities -->
+                        <section>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                                In the apartment
+                            </p>
+
+                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">
+                                Amenities
+                            </h2>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                                @foreach (var amenity in Apartment.Amenities)
+                                {
+                                    <div class="flex items-center gap-2 text-sm text-foreground">
+                                        <i class="fa-solid fa-check text-accent shrink-0"></i>
+                                        @amenity
+                                    </div>
+                                }
+                            </div>
+                        </section>
+
+                        <!-- Features -->
+                        <section>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                                Building & Security
+                            </p>
+
+                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">
+                                Features
+                            </h2>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                                @foreach (var feature in Apartment.Features)
+                                {
+                                    <div class="flex items-center gap-2 text-sm text-foreground">
+                                        <i class="fa-solid fa-check text-accent shrink-0"></i>
+                                        @feature
+                                    </div>
+                                }
+                            </div>
+                        </section>
+
+                        <!-- Pricing -->
+                        <section>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                                Rates
+                            </p>
+
+                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">
+                                Pricing (KES)
+                            </h2>
+
+                            <div class="grid sm:grid-cols-2 gap-px bg-border border border-border">
+                                <div class="bg-background p-8">
+                                    <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
+                                        Per Night
+                                    </p>
+
+                                    <p class="font-heading text-4xl text-primary">
+                                        KES @Apartment.NightlyRate.ToString("N0")
+                                    </p>
+
+                                    <p class="text-xs text-muted-foreground mt-2">
+                                        Minimum 1 night stay
+                                    </p>
+                                </div>
+
+                                <div class="bg-background p-8">
+                                    <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
+                                        Per Month
+                                    </p>
+
+                                    <p class="font-heading text-4xl text-primary">
+                                        KES @Apartment.MonthlyRate.ToString("N0")
+                                    </p>
+
+                                    <p class="text-xs text-muted-foreground mt-2">
+                                        Best value for extended stays
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Inquiry Sidebar -->
+                    <aside class="lg:col-span-1">
+                        <div class="sticky top-24 space-y-4">
+                            @* <InquiryForm ApartmentName="@Apartment.Name" /> *@
+
+                            <a href="@($"/booking?apartment={Apartment.Id}")"
+                               class="w-full inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold px-6 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition">
+                                Continue to Booking
+                            </a>
+
+                            <div class="border border-border p-6">
+                                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-4">
+                                    Quick info
+                                </p>
+
+                                <ul class="space-y-3 text-sm">
+                                    @foreach (var info in QuickInfo)
+                                    {
+                                        <li class="flex justify-between border-b border-border last:border-0 pb-2">
+                                            <span class="text-muted-foreground">@info.Label</span>
+                                            <span class="text-foreground font-medium text-right">@info.Value</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ApartmentListing? Apartment =>
+        ApartmentData.Apartments.FirstOrDefault(a => a.Id == Id);
+
+    private List<QuickInfoItem> QuickInfo => Apartment is null
+        ? new()
+        : new()
+        {
+            new("Check-in", "3:00 PM"),
+            new("Check-out", "11:00 AM"),
+            new("Beds", Apartment.Beds),
+            new("Floor area", Apartment.Size),
+            new("Floor", Apartment.Floor),
+            new("Location", Apartment.Area)
+        };
+
+    private record QuickInfoItem(string Label, string Value);
+}

@@ -13,25 +13,27 @@
 
         <div class="lg:col-span-5 bg-primary text-primary-foreground flex items-center justify-end">
 
-            <div class="max-w-md px-8 lg:px-12 mr-12 lg:mr-24 border border-red">
-                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-6">
-                    Signature
-                </p>
+           <div class="flex items-center justify-center h-full w-full">
+    <div class="max-w-md px-8 lg:px-16">
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-6 mt-3">
+            Signature
+        </p>
 
-                <h2 class="font-heading text-5xl lg:text-6xl mb-8 leading-none">
-                    Move-in <span class="italic text-accent">Ready</span>
-                </h2>
+        <h2 class="font-heading text-5xl lg:text-6xl mb-8 leading-none">
+            Move-in <span class="italic text-accent">Ready</span>
+        </h2>
 
-                <p class="opacity-80 leading-relaxed mb-10 text-lg">
-                    From fitted kitchens and fast WiFi to Smart TVs with Netflix and on-site gyms,
-                    every apartment is set up so you can settle in the moment you arrive.
-                </p>
+        <p class="opacity-80 leading-relaxed mb-4 text-lg">
+            From fitted kitchens and fast WiFi to Smart TVs with Netflix and on-site gyms,
+            every apartment is set up so you can settle in the moment you arrive.
+        </p>
 
-                <a href="/booking"
-                   class="inline-flex items-center justify-center px-6 py-4 text-xs font-bold uppercase tracking-widest rounded-sm bg-accent text-primary hover:bg-accent/90 transition">
-                    Book Your Stay
-                </a>
-            </div>
+        <a href="/booking"
+           class="inline-flex items-center mb-3 justify-center px-6 py-4 text-xs font-bold uppercase tracking-widest rounded-sm bg-accent text-primary hover:bg-accent/90 transition">
+            Book Your Stay
+        </a>
+    </div>
+</div>
         </div>
     </div>
 </section>
@@ -55,11 +57,11 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 border-t border-l border-border">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-0 p-4">
             @foreach (var item in AmenityData.Amenities.Select((amenity, index) => new { amenity, index }))
             {
                 <div @key="item.amenity.Title"
-                     class="border-r border-border p-20 lg:p-22 min-h-[420px] flex items-start hover:bg-primary/40 transition-colors">
+                     class="border border-border rounded-lg p-6 lg:p-8 min-h-[420px] flex items-start hover:bg-primary/10 transition-colors cursor-pointer">
 
                     <div class="flex items-start gap-5">
                         <i class="@($"{item.amenity.Icon} text-accent text-3xl shrink-0 mt-1")"></i>
@@ -87,7 +89,7 @@
             Ready to <span class="italic text-accent">settle in</span>?
         </h2>
 
-        <p class="opacity-80 mb-10">
+        <p class="opacity-80 mb-6">
             Book your apartment and enjoy a fully equipped home from day one.
         </p>
 
