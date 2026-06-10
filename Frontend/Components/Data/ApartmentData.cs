@@ -40,6 +40,12 @@ public static class ApartmentData
                 "Backup Water",
                 "Power Backup",
                 "Secure Access"
+            },
+            Images: new List<string>
+            {
+                "images/Dream/rooftop.jpeg",
+                "images/Dream/balcony.jpeg",
+                // add more Prince House images here
             }
         ),
 
@@ -77,6 +83,18 @@ public static class ApartmentData
                 "Backup Water",
                 "Power Backup",
                 "Secure Access"
+            },
+            Images: new List<string>
+            {
+                "images/Dream/balcony.jpeg",
+                "images/Dream/rooftop.jpeg",
+                "images/Dream/dining.jpeg",
+                "images/Dream/broom1.jpeg",
+                "images/Dream/broom2.jpeg",
+                "images/Dream/Kitchen.jpeg",
+                "images/Dream/washroom.jpeg",
+                "images/Dream/gym.jpeg"
+                // add more Dream House images here
             }
         ),
 
@@ -114,6 +132,12 @@ public static class ApartmentData
                 "Backup Water",
                 "Power Backup",
                 "Secure Access"
+            },
+            Images: new List<string>
+            {
+                "images/Dream/rooftop.jpeg",
+                "images/Dream/balcony.jpeg",
+                // add more Ndovu House images here
             }
         )
     };

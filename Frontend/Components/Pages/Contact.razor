@@ -1,0 +1,206 @@
+@page "/contact"
+<div>
+    <PageHero Eyebrow="We're Here"
+    Title="Get In Touch" Highlight="Touch"
+              Description="Have a question, special request, or planning a longer stay? Our concierge team is one message away.">
+
+    </PageHero>
+    
+
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-12 gap-12 lg:gap-16">
+            <div class="lg:col-span-5 space-y-10">
+                <div>
+                    <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Contact</p>
+                    <h2 class="font-heading text-4xl text-primary leading-tight mb-4">
+                        Drop us a <span class="italic">line</span>
+                    </h2>
+                    <p class="text-muted-foreground leading-relaxed">
+                        Whether it's an apartment, amenities, or a bespoke booking — we'll respond personally within hours.
+                    </p>
+                </div>
+
+                <div class="space-y-px bg-border">
+                    @foreach (var c in ContactInfo)
+                    {
+                        <div @key="c.Label" class="bg-background flex items-start gap-5 p-6">
+                            <i class="@($"{c.Icon} h-5 w-5 text-accent shrink-0 mt-1")"></i>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground mb-1">@c.Label</p>
+                                @if (!string.IsNullOrWhiteSpace(c.Href))
+                                {
+                                    <a href="@c.Href" class="text-foreground hover:text-accent transition-colors">@c.Value</a>
+                                }
+                                else
+                                {
+                                    <p class="text-foreground whitespace-pre-line">@c.Value</p>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div>
+                    <button type="button" @onclick="ToggleLandmarks" class="w-full flex items-center justify-between p-5 border border-border hover:bg-muted/40 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-location-dot h-4 w-4 text-accent"></i>
+                            <span class="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground">Nearby Landmarks</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180"></i>
+                    </button>
+
+                    @if (IsLandmarksOpen)
+                    {
+                        <div>
+                            <div class="grid grid-cols-2 gap-px bg-border mt-px">
+                                @foreach (var l in Landmarks)
+                                {
+                                    <div @key="l.Name" class="bg-background p-4">
+                                        <p class="text-sm font-medium text-foreground">@l.Name</p>
+                                        <p class="text-[10px] uppercase tracking-widest text-accent font-bold mt-1">@l.Distance</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="lg:col-span-7">
+                <div class="bg-card border border-border p-8 lg:p-12">
+                    <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Send a Message</p>
+                    <h2 class="font-heading text-3xl lg:text-4xl text-primary mb-8 leading-tight">
+                        Let's start a <span class="italic">conversation</span>
+                    </h2>
+
+                    <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true" class="space-y-5">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="name" class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground block mb-2">Full Name *</label>
+                                <input id="name" name="name" value="@FormData.Name" @oninput="HandleChange" class="@($"rounded-sm {(Errors.ContainsKey("name") ? "border-destructive" : "")}")" />
+                                @if (Errors.ContainsKey("name"))
+                                {
+                                    <p class="text-destructive text-xs mt-1">@Errors["name"]</p>
+                                }
+                            </div>
+
+                            <div>
+                                <label for="email" class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground block mb-2">Email *</label>
+                                <input id="email" name="email" type="email" value="@FormData.Email" @oninput="HandleChange" class="@($"rounded-sm {(Errors.ContainsKey("email") ? "border-destructive" : "")}")" />
+                                @if (Errors.ContainsKey("email"))
+                                {
+                                    <p class="text-destructive text-xs mt-1">@Errors["email"]</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="phone" class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground block mb-2">Phone</label>
+                                <input id="phone" name="phone" type="tel" value="@FormData.Phone" @oninput="HandleChange" class="rounded-sm" />
+                            </div>
+
+                            <div>
+                                <label for="subject" class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground block mb-2">Subject *</label>
+                                <input id="subject" name="subject" value="@FormData.Subject" @oninput="HandleChange" class="@($"rounded-sm {(Errors.ContainsKey("subject") ? "border-destructive" : "")}")" />
+                                @if (Errors.ContainsKey("subject"))
+                                {
+                                    <p class="text-destructive text-xs mt-1">@Errors["subject"]</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="message" class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground block mb-2">Message *</label>
+                            <textarea id="message" name="message" rows="6" @oninput="HandleChange" class="@($"rounded-sm {(Errors.ContainsKey("message") ? "border-destructive" : "")}")">@FormData.Message</textarea>
+                            @if (Errors.ContainsKey("message"))
+                            {
+                                <p class="text-destructive text-xs mt-1">@Errors["message"]</p>
+                            }
+                        </div>
+
+                        <button type="submit" class="rounded-sm uppercase tracking-widest text-xs font-bold w-full py-6" disabled="@IsSubmitting">
+                            @(IsSubmitting ? "Sending..." : "Send Message")
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    private bool IsSubmitting;
+    private bool IsLandmarksOpen;
+    private ContactFormModel FormData = new();
+    private Dictionary<string, string> Errors = new();
+
+    private readonly List<ContactInfoItem> ContactInfo = new()
+    {
+        new("fa-solid fa-location-dot", "Address", "123 Golf Course Drive\nParadise Valley, AZ 85253", null),
+        new("fa-solid fa-phone", "Phone", "+1 (234) 567-890", "tel:+1234567890"),
+        new("fa-solid fa-envelope", "Email", "info@golfview.com", "mailto:info@golfview.com"),
+        new("fa-solid fa-clock", "Office Hours", "Mon – Fri: 9:00 – 18:00\nSat: 10:00 – 16:00\nSun: By Appointment", null)
+    };
+
+    private readonly List<LandmarkItem> Landmarks = new()
+    {
+        new("Yaya Center", "1.2KM"),
+        new("Prestige Plaza", "1.8KM"),
+        new("Valley Arcade", "2.4KM"),
+        new("Junction Mall", "5KM"),
+        new("The CBD", "5.2KM"),
+        new("Westlands", "5.1KM")
+    };
+
+    private void ToggleLandmarks()
+    {
+        IsLandmarksOpen = !IsLandmarksOpen;
+    }
+
+    private void HandleChange(ChangeEventArgs e)
+    {
+        var name = e.Value?.ToString();
+
+        if (e.Value is null)
+            return;
+    }
+
+    private async Task HandleSubmit()
+    {
+        Errors.Clear();
+
+        if (string.IsNullOrWhiteSpace(FormData.Name))
+            Errors["name"] = "Name is required";
+
+        if (string.IsNullOrWhiteSpace(FormData.Email))
+            Errors["email"] = "Invalid email address";
+
+        if (string.IsNullOrWhiteSpace(FormData.Subject))
+            Errors["subject"] = "Subject is required";
+
+        if (string.IsNullOrWhiteSpace(FormData.Message))
+            Errors["message"] = "Message is required";
+
+        if (Errors.Any())
+            return;
+
+        IsSubmitting = true;
+        await Task.Delay(1000);
+
+        FormData = new();
+        IsSubmitting = false;
+    }
+
+    private record ContactInfoItem(string Icon, string Label, string Value, string? Href);
+    private record LandmarkItem(string Name, string Distance);
+
+    private class ContactFormModel
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string Subject { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+}

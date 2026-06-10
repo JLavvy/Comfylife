@@ -18,5 +18,6 @@ public record ApartmentListing(
     int NightlyRate,
     int MonthlyRate,
     List<string> Amenities,
-    List<string> Features
+    List<string> Features,
+    List<string>? Images = null      // ← added at the end, nullable so nothing breaks
 );

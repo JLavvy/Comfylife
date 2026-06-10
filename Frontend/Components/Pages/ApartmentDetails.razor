@@ -1,15 +1,18 @@
 @page "/apartments/{Id:int}"
-@using Comfylife.Frontend.Data
 @using Comfylife.Frontend.Models
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Components.UI
 
-@if (Apartment is null)
+@rendermode InteractiveServer
+
+@if (apartment == null)
 {
     <div class="min-h-[60vh] flex items-center justify-center">
         <div class="text-center">
             <h1 class="font-heading text-3xl text-primary mb-6">Apartment Not Found</h1>
 
             <a href="/apartments"
-               class="inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 transition">
+               class="inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold bg-primary text-primary-foreground h-10 px-4 py-2">
                 View All Apartments
             </a>
         </div>
@@ -18,195 +21,191 @@
 else
 {
     <div class="bg-white">
-        <!-- Breadcrumb + Editorial Title -->
-        <div class="bg-muted/30 border-b border-border">
-            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-14 lg:py-20">
 
-                <nav
-                    class="flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-12">
+        <!-- Header -->
+        <div class="bg-muted/30 border-b border-border py-12">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+
+                <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-10">
                     <a href="/" class="hover:text-accent transition-colors">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                    <i class="fa-solid fa-chevron-right text-[8px]"></i>
                     <a href="/apartments" class="hover:text-accent transition-colors">Apartments</a>
-                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                    <span class="text-accent">@Apartment.Name</span>
+                    <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                    <span class="text-accent">@apartment.Name</span>
                 </nav>
 
-                <div class="grid lg:grid-cols-12 gap-10 items-end">
-                    <div class="lg:col-span-8">
-                        <div
-                            class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.45em] text-accent mb-8">
-                            <span class="h-px w-12 bg-accent"></span>
-                            @Apartment.Tagline
+                <div class="grid lg:grid-cols-2 gap-8 items-end py-4">
+
+                    <div>
+                        <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-accent mb-4">
+                            <span class="h-px w-10 bg-accent"></span>
+                            @apartment.Tagline
                         </div>
 
-                        <h1 class="font-heading text-6xl lg:text-8xl text-primary leading-[0.9] mb-6">
-                            @Apartment.Name
+                        <h1 class="font-heading text-5xl lg:text-6xl text-primary leading-[0.95] mb-4">
+                            @apartment.Name
                         </h1>
 
                         <p class="flex items-center gap-2 text-sm text-muted-foreground">
                             <i class="fa-solid fa-location-dot text-accent"></i>
-                            @Apartment.Location • @Apartment.Size • @Apartment.Floor
+                            @apartment.Location • @apartment.Size • @apartment.Floor
                         </p>
                     </div>
 
-                    <div class="lg:col-span-4 lg:text-right pb-4">
-                        <p class="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+                    <div class="lg:text-right">
+                        <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">
                             Per Night
                         </p>
 
-                        <div class="font-heading text-5xl lg:text-6xl text-primary leading-none">
-                            KES @Apartment.NightlyRate.ToString("N0")
-                            <span class="text-sm text-muted-foreground font-body">/night</span>
+                        <div class="font-heading text-4xl lg:text-5xl text-primary leading-none">
+                            KES @apartment.NightlyRate.ToString("N0")
+                            <span class="text-base text-muted-foreground font-body">/night</span>
                         </div>
 
-                        <p class="text-xs text-muted-foreground mt-3">
-                            or KES @Apartment.MonthlyRate.ToString("N0")/month
+                        <p class="text-xs text-muted-foreground mt-2">
+                            or KES @apartment.MonthlyRate.ToString("N0")/month
                         </p>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- Hero Image -->
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-10">
-            <div class="relative rounded-sm overflow-hidden bg-secondary aspect-[16/9] max-h-[600px]">
-                <img src="@Apartment.Image" alt="@Apartment.Name" class="w-full h-full object-cover" />
-            </div>
+        <!-- Hero Image + Thumbnails -->
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-10 e">
 
-            <div class="grid grid-cols-4 md:grid-cols-6 gap-3 mt-3">
-                @for (var i = 0; i < 6; i++)
+            <div class="relative rounded-sm overflow-hidden border bg-white border-border bg-muted">
+                <img src="@GalleryImages[selectedImageIndex]"
+                     alt="@apartment.Name"
+                     class="max-w-5xl h-full object-cover " />
+
+                @if (GalleryImages.Count > 1)
                 {
-                    var imageNumber = i + 1;
-
-                    <button
-                        class="aspect-[4/3] rounded-sm overflow-hidden border border-border hover:border-accent transition-colors"
-                        aria-label="@($"View image {imageNumber}")">
-                        <img src="@Apartment.Image" alt="" class="w-full h-full object-cover" loading="lazy" />
+                    <button type="button"
+                            @onclick="PrevImage"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center rounded-sm">
+                        <i class="fa-solid fa-chevron-left"></i>
                     </button>
+
+                    <button type="button"
+                            @onclick="NextImage"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center rounded-sm">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <div class="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-sm">
+                        @(selectedImageIndex + 1) / @GalleryImages.Count
+                    </div>
                 }
             </div>
+
+            @if (GalleryImages.Count > 1)
+            {
+                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 mt-4">
+                    @for (int i = 0; i < GalleryImages.Count; i++)
+                    {
+                        var index = i;
+
+                        <button type="button"
+                                @onclick="() => SelectImage(index)"
+                                class="@GetThumbnailClass(index)">
+                            <img src="@GalleryImages[index]"
+                                 alt="@($"{apartment.Name} image {index + 1}")"
+                                 class="max-w-[250px]  h-full object-cover"
+                                 loading="lazy" />
+                        </button>
+                    }
+                </div>
+            }
+
         </div>
 
         <!-- Body -->
         <section class="py-20">
             <div class="max-w-7xl mx-auto px-6 lg:px-8">
                 <div class="grid lg:grid-cols-3 gap-12">
+
                     <div class="lg:col-span-2 space-y-16">
-                        <!-- Quick Stats -->
+
                         <div class="grid grid-cols-2 md:grid-cols-5 gap-px bg-border border border-border">
-                            <Stat Icon="fa-solid fa-users" Label="Guests" Value="@Apartment.MaxGuests.ToString()" />
-                            <Stat Icon="fa-solid fa-bed" Label="Beds" Value="@Apartment.Beds" />
-                            <Stat Icon="fa-solid fa-bath" Label="Baths" Value="@Apartment.Bathrooms.ToString()" />
-                            <Stat Icon="fa-solid fa-expand" Label="Size" Value="@Apartment.Size" />
-                            <Stat Icon="fa-solid fa-building" Label="Floor" Value="@Apartment.Floor" />
+                            <Stat Icon="fa-users" Label="Guests" Value="@apartment.MaxGuests.ToString()" />
+                            <Stat Icon="fa-bed" Label="Beds" Value="@apartment.Beds" />
+                            <Stat Icon="fa-bath" Label="Baths" Value="@apartment.Bathrooms.ToString()" />
+                            <Stat Icon="fa-maximize" Label="Size" Value="@apartment.Size" />
+                            <Stat Icon="fa-building" Label="Floor" Value="@apartment.Floor" />
                         </div>
 
-                        <!-- About -->
                         <section>
-                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
-                                Overview
-                            </p>
-
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Overview</p>
                             <h2 class="font-heading text-4xl text-primary mb-6 leading-tight">
                                 About this <span class="italic">apartment</span>
                             </h2>
-
                             <p class="text-foreground/70 leading-relaxed text-lg">
-                                @Apartment.LongDescription
+                                @apartment.LongDescription
                             </p>
                         </section>
 
-                        <!-- Amenities -->
                         <section>
-                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
-                                In the apartment
-                            </p>
-
-                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">
-                                Amenities
-                            </h2>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">In the apartment</p>
+                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">Amenities</h2>
 
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
-                                @foreach (var amenity in Apartment.Amenities)
+                                @foreach (var amenity in apartment.Amenities)
                                 {
                                     <div class="flex items-center gap-2 text-sm text-foreground">
-                                        <i class="fa-solid fa-check text-accent shrink-0"></i>
+                                        <i class="fa-solid fa-check h-4 w-4 text-accent shrink-0"></i>
                                         @amenity
                                     </div>
                                 }
                             </div>
                         </section>
 
-                        <!-- Features -->
                         <section>
-                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
-                                Building & Security
-                            </p>
-
-                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">
-                                Features
-                            </h2>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Building &amp; Security</p>
+                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">Features</h2>
 
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
-                                @foreach (var feature in Apartment.Features)
+                                @foreach (var feature in apartment.Features)
                                 {
                                     <div class="flex items-center gap-2 text-sm text-foreground">
-                                        <i class="fa-solid fa-check text-accent shrink-0"></i>
+                                        <i class="fa-solid fa-check h-4 w-4 text-accent shrink-0"></i>
                                         @feature
                                     </div>
                                 }
                             </div>
                         </section>
 
-                        <!-- Pricing -->
                         <section>
-                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
-                                Rates
-                            </p>
-
-                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">
-                                Pricing (KES)
-                            </h2>
+                            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Rates</p>
+                            <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">Pricing (KES)</h2>
 
                             <div class="grid sm:grid-cols-2 gap-px bg-border border border-border">
                                 <div class="bg-background p-8">
-                                    <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
-                                        Per Night
-                                    </p>
-
+                                    <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Per Night</p>
                                     <p class="font-heading text-4xl text-primary">
-                                        KES @Apartment.NightlyRate.ToString("N0")
+                                        KES @apartment.NightlyRate.ToString("N0")
                                     </p>
-
-                                    <p class="text-xs text-muted-foreground mt-2">
-                                        Minimum 1 night stay
-                                    </p>
+                                    <p class="text-xs text-muted-foreground mt-2">Minimum 1 night stay</p>
                                 </div>
 
                                 <div class="bg-background p-8">
-                                    <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">
-                                        Per Month
-                                    </p>
-
+                                    <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Per Month</p>
                                     <p class="font-heading text-4xl text-primary">
-                                        KES @Apartment.MonthlyRate.ToString("N0")
+                                        KES @apartment.MonthlyRate.ToString("N0")
                                     </p>
-
-                                    <p class="text-xs text-muted-foreground mt-2">
-                                        Best value for extended stays
-                                    </p>
+                                    <p class="text-xs text-muted-foreground mt-2">Best value for extended stays</p>
                                 </div>
                             </div>
                         </section>
+
                     </div>
 
-                    <!-- Inquiry Sidebar -->
                     <aside class="lg:col-span-1">
                         <div class="sticky top-24 space-y-4">
-                            @* <InquiryForm ApartmentName="@Apartment.Name" /> *@
+                            <InquiryForm ApartmentName="@apartment.Name" />
 
-                            <a href="@($"/booking?apartment={Apartment.Id}")"
-                               class="w-full inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold px-6 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition">
+                            <a href="@($"/booking?apartment={apartment.Id}")"
+                               class="inline-flex items-center justify-center w-full rounded-sm uppercase tracking-widest text-xs font-bold bg-primary text-primary-foreground h-11 px-8">
                                 Continue to Booking
                             </a>
 
@@ -216,20 +215,22 @@ else
                                 </p>
 
                                 <ul class="space-y-3 text-sm">
-                                    @foreach (var info in QuickInfo)
+                                    @foreach (var item in QuickInfo)
                                     {
                                         <li class="flex justify-between border-b border-border last:border-0 pb-2">
-                                            <span class="text-muted-foreground">@info.Label</span>
-                                            <span class="text-foreground font-medium text-right">@info.Value</span>
+                                            <span class="text-muted-foreground">@item.Key</span>
+                                            <span class="text-foreground font-medium text-right">@item.Value</span>
                                         </li>
                                     }
                                 </ul>
                             </div>
                         </div>
                     </aside>
+
                 </div>
             </div>
         </section>
+
     </div>
 }
 
@@ -237,20 +238,64 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private ApartmentListing? Apartment =>
-        ApartmentData.Apartments.FirstOrDefault(a => a.Id == Id);
+    private ApartmentListing? apartment;
+    private int selectedImageIndex = 0;
 
-    private List<QuickInfoItem> QuickInfo => Apartment is null
-        ? new()
-        : new()
+    private List<string> GalleryImages =>
+        apartment?.Images is { Count: > 0 }
+            ? apartment.Images
+            : new List<string> { apartment?.Image ?? "" };
+
+    private List<KeyValuePair<string, string>> QuickInfo =>
+        apartment == null
+            ? new()
+            : new()
+            {
+                new("Check-in", "3:00 PM"),
+                new("Check-out", "11:00 AM"),
+                new("Beds", apartment.Beds),
+                new("Floor area", apartment.Size),
+                new("Floor", apartment.Floor),
+                new("Location", apartment.Area)
+            };
+
+    protected override void OnParametersSet()
+    {
+        apartment = ApartmentData.Apartments.FirstOrDefault(a => a.Id == Id);
+        selectedImageIndex = 0;
+    }
+
+    private void SelectImage(int index)
+    {
+        selectedImageIndex = index;
+    }
+
+    private void PrevImage()
+    {
+        if (GalleryImages.Count == 0)
         {
-            new("Check-in", "3:00 PM"),
-            new("Check-out", "11:00 AM"),
-            new("Beds", Apartment.Beds),
-            new("Floor area", Apartment.Size),
-            new("Floor", Apartment.Floor),
-            new("Location", Apartment.Area)
-        };
+            return;
+        }
 
-    private record QuickInfoItem(string Label, string Value);
+        selectedImageIndex = (selectedImageIndex - 1 + GalleryImages.Count) % GalleryImages.Count;
+    }
+
+    private void NextImage()
+    {
+        if (GalleryImages.Count == 0)
+        {
+            return;
+        }
+
+        selectedImageIndex = (selectedImageIndex + 1) % GalleryImages.Count;
+    }
+
+    private string GetThumbnailClass(int index)
+    {
+        var borderClass = selectedImageIndex == index
+            ? "border-accent"
+            : "border-transparent hover:border-accent/50";
+
+        return $"h-20 lg:h-24 rounded-sm overflow-hidden border-2 transition-all focus:outline-none {borderClass}";
+    }
 }
