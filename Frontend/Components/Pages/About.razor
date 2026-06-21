@@ -1,0 +1,158 @@
+@page "/about"
+@using Comfylife.Frontend.Data
+
+<PageHero Eyebrow="Est. 2024" 
+          Title="About ComfyLife" 
+          Highlight="ComfyLife"
+          Description="A boutique residence shaped around the rituals of slow living, considered hospitality, and a singular point of view on comfort.">
+</PageHero>
+
+<section class="py-16 lg:py-24 bg-white border-t border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center">
+
+            <div class="lg:col-span-7 relative">
+                <img src="/images/Dream/gym.jpeg"
+                     alt="ComfyLife exterior"
+                     class="w-full h-[280px] sm:h-[400px] lg:h-[520px] object-cover rounded-sm shadow-elegant" />
+            </div>
+
+            <div class="lg:col-span-5 space-y-5 pt-8 lg:pt-0">
+                <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+                    <span class="h-px w-10 bg-accent"></span>
+                    Our Story
+                </div>
+
+                <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl text-primary leading-tight">
+                    A sanctuary built on <span class="italic">stillness</span> and craft.
+                </h2>
+
+                <div class="space-y-4 text-foreground/70 leading-relaxed text-sm sm:text-base">
+                    <p>
+                        Founded with a singular vision — to create a residence where luxury feels lived-in,
+                        never staged. Each apartment is shaped by a quiet attention to texture, light, and silence.
+                    </p>
+
+                    <p>
+                        Nestled in Kilimani, our residences have grown into a destination for guests who value
+                        comfort, privacy, and thoughtful details.
+                    </p>
+
+                    <p>
+                        We continue to refine — embracing modern comforts, reliable hospitality, and a service
+                        experience that feels personal from arrival to departure.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-24 lg:py-32" style="background-color: #f0ebe4;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-12 lg:mb-16">
+            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-semibold mb-4">
+                What We Stand For
+            </p>
+
+            <h2 class="font-heading text-4xl sm:text-5xl lg:text-6xl text-primary">
+                Our <span class="italic text-accent">Values</span>
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 bg-white rounded-sm shadow-elegant divide-y divide-border sm:divide-x sm:divide-border lg:divide-y-0">
+            @foreach (var item in Values.Select((value, index) => new { value, index }))
+            {
+                <div class="p-8 lg:p-10 min-h-[320px] sm:min-h-[260px]">
+                    <i class="@item.value.Icon text-accent text-2xl mb-6 block"></i>
+
+                    <h3 class="font-heading text-xl sm:text-2xl text-primary mb-3">
+                        @item.value.Title
+                    </h3>
+
+                    <p class="text-sm text-muted-foreground leading-relaxed">
+                        @item.value.Description
+                    </p>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<section class="py-24 lg:py-24 bg-white border-t border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
+
+            @foreach (var item in Stats.Select((stat, index) => new { stat, index }))
+            {
+                <div class="flex gap-4 sm:gap-6 animate-fade-up"
+                     style="animation-delay:@($"{item.index * 80}ms")">
+
+                    <span class="w-px h-10 bg-accent"></span>
+
+                    <div>
+                        <div class="font-heading text-4xl sm:text-5xl lg:text-6xl text-primary mb-2">
+                            @item.stat.Number
+                        </div>
+
+                        <div class="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-bold">
+                            @item.stat.Label
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+<section class="py-24 lg:py-32 bg-primary text-primary-foreground">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+
+        <h2 class="font-heading text-4xl sm:text-5xl lg:text-6xl mb-6">
+            Experience <span class="italic text-accent">ComfyLife</span> for yourself
+        </h2>
+
+        <p class="opacity-80 text-base sm:text-lg mb-12">
+            We'd love to welcome you to our home away from home.
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <NavLink href="/booking"
+                     class="inline-flex items-center justify-center gap-2 rounded-sm uppercase tracking-widest text-xs font-bold px-10 sm:px-14 py-4 bg-accent text-accent-fg hover:bg-accent/90 transition">
+                Book Your Stay
+                <i class="fas fa-arrow-right text-sm"></i>
+            </NavLink>
+
+            <NavLink href="/contact"
+                     class="inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold px-10 sm:px-14 py-4 border border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground hover:text-primary transition">
+                Get in Touch
+            </NavLink>
+        </div>
+
+    </div>
+</section>
+
+@code {
+    private sealed record ValueItem(string Icon, string Title, string Description);
+    private sealed record StatItem(string Number, string Label);
+
+    private static readonly List<ValueItem> Values =
+    [
+        new("fas fa-award", "Excellence", "Service shaped by precision and refined taste."),
+        new("fas fa-heart", "Hospitality", "Every guest, anticipated. Every detail, intentional."),
+        new("fas fa-users", "Community", "Connections rooted in the place we proudly call home."),
+        new("fas fa-leaf", "Sustainability", "Quiet stewardship of the landscape we belong to.")
+    ];
+
+    private static readonly List<StatItem> Stats =
+    [
+        new($"{ApartmentData.Apartments.Count}", "Curated Listings"),
+        new("Kilimani", "Prime Location"),
+        new("24/7", "Security & Support"),
+        new("4.9", "Average Rating")
+    ];
+}

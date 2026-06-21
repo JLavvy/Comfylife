@@ -1,0 +1,466 @@
+@page "/booking"
+@rendermode InteractiveServer
+@using Comfylife.Frontend.Models
+@using Comfylife.Frontend.Data
+
+
+<div>
+
+   <PageHero Eyebrow="Book Your Stay"
+    Title="Make a Reservation" 
+    Highlight="Reservation"
+    Description="Choose your apartment and dates. We'll confirm your reservation within 24 hours." />
+
+    @* ── Body ── *@
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            @* KEY FIX: items-start keeps the sidebar from stretching to
+               the form height. Without it, sticky positioning has nothing
+               to stick inside and the aside just falls below the form. *@
+            <div class="grid lg:grid-cols-3 gap-12 items-start">
+
+                @* ── Form column (2/3) ── *@
+                <div class="lg:col-span-2">
+                    <div class="bg-card border border-border p-8 lg:p-12">
+
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                            Reservation Details
+                        </p>
+                        <h2 class="font-heading text-3xl lg:text-4xl text-primary mb-8 leading-tight">
+                            Tell us about your <span class="italic">stay</span>
+                        </h2>
+
+                        <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true" class="space-y-6">
+
+                            @* Name row *@
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">First Name *</label>
+                                    <input @bind="FormData.FirstName" @bind:event="oninput"
+                                           placeholder="John" class="@InputClass("firstName")" />
+                                    @Error("firstName")
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Last Name *</label>
+                                    <input @bind="FormData.LastName" @bind:event="oninput"
+                                           placeholder="Doe" class="@InputClass("lastName")" />
+                                    @Error("lastName")
+                                </div>
+                            </div>
+
+                            @* Contact row *@
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Email *</label>
+                                    <input type="email" @bind="FormData.Email" @bind:event="oninput"
+                                           placeholder="john@example.com" class="@InputClass("email")" />
+                                    @Error("email")
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Phone *</label>
+                                    <input type="tel" @bind="FormData.Phone" @bind:event="oninput"
+                                           placeholder="+254 700 000 000" class="@InputClass("phone")" />
+                                    @Error("phone")
+                                </div>
+                            </div>
+
+                            @* Apartment select *@
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Select Apartment *</label>
+                                <select @bind="FormData.Apartment" class="@SelectClass("apartment")">
+                                    <option value="">Choose an apartment</option>
+                                    @foreach (var apt in Apartments)
+                                    {
+                                        <option value="@apt.Id.ToString()">
+                                            @apt.Name — @apt.Bedrooms Bed · KES @apt.NightlyRate.ToString("N0")/night
+                                        </option>
+                                    }
+                                </select>
+                                @Error("apartment")
+                            </div>
+
+                            @* Stay type *@
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Stay Type *</label>
+                                <select @bind="FormData.StayType" class="@SelectClass("stayType")">
+                                    <option value="nightly">Per Night</option>
+                                    <option value="monthly">Per Month</option>
+                                </select>
+                            </div>
+
+                            @* Date row *@
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Check-in Date *</label>
+                                    <InputDate @bind-Value="FormData.CheckIn" class="@InputClass("checkIn")" />
+                                    @Error("checkIn")
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Check-out Date *</label>
+                                    <InputDate @bind-Value="FormData.CheckOut" class="@InputClass("checkOut")" />
+                                    @Error("checkOut")
+                                </div>
+                            </div>
+
+                            @* Guests *@
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Number of Guests *</label>
+                                <select @bind="FormData.Guests" class="@SelectClass("guests")">
+                                    <option value="">Select number of guests</option>
+                                    @for (var num = 1; num <= 6; num++)
+                                    {
+                                        <option value="@num.ToString()">@num @(num == 1 ? "Guest" : "Guests")</option>
+                                    }
+                                </select>
+                                @Error("guests")
+                            </div>
+
+                            @* Special requests *@
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Special Requests</label>
+                                <textarea rows="4"
+                                          @bind="FormData.SpecialRequests"
+                                          @bind:event="oninput"
+                                          placeholder="Any special requirements or preferences..."
+                                          class="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"></textarea>
+                                @Error("specialRequests")
+                            </div>
+
+                            @* Success banner *@
+                            @if (!string.IsNullOrWhiteSpace(SuccessMessage))
+                            {
+                                <div class="border border-primary/30 bg-primary/10 text-primary text-sm p-4">
+                                    @SuccessMessage
+                                </div>
+                            }
+
+                            @* Submit *@
+                            <button type="submit"
+                                    disabled="@IsSubmitting"
+                                    class="w-full rounded-sm uppercase tracking-widest text-xs font-bold inline-flex items-center justify-center px-8 py-5 bg-accent text-accent-foreground hover:bg-accent/90 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                                @(IsSubmitting ? "Submitting…" : "Request Reservation")
+                            </button>
+
+                        </form>
+                    </div>
+                </div>
+
+                @* ── Sidebar (1/3) ── *@
+                @* KEY FIX: sticky top-24 only works when the grid uses
+                   items-start (the column height = content height, not
+                   the sibling's height). With items-stretch (the default)
+                   the column is as tall as the form, the sticky element
+                   has no room to scroll within, so it just sits at the top
+                   and looks like it disappeared. *@
+                <aside class="lg:col-span-1">
+                    <div class="bg-card border border-border p-8 sticky top-24">
+
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                            Summary
+                        </p>
+                        <h3 class="font-heading text-2xl text-primary mb-6">
+                            Your <span class="italic">Booking</span>
+                        </h3>
+
+                        <div class="space-y-4 text-sm">
+
+                            @* Guest name *@
+                            @if (!string.IsNullOrWhiteSpace(FormData.FirstName) || !string.IsNullOrWhiteSpace(FormData.LastName))
+                            {
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Guest Name</span>
+                                    <span class="font-medium text-foreground text-right">@FormData.FirstName @FormData.LastName</span>
+                                </div>
+                            }
+
+                            @* Apartment details *@
+                            @if (SelectedApartment is not null)
+                            {
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Apartment</span>
+                                    <span class="font-medium text-foreground text-right">@SelectedApartment.Name</span>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Location</span>
+                                    <span class="font-medium text-foreground text-right">@SelectedApartment.Location</span>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Bedrooms</span>
+                                    <span class="font-medium text-foreground">@SelectedApartment.Bedrooms</span>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Beds</span>
+                                    <span class="font-medium text-foreground text-right">@SelectedApartment.Beds</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted-foreground">Select an apartment to see pricing</p>
+                            }
+
+                            @* Stay type *@
+                            <div class="flex justify-between gap-4">
+                                <span class="text-muted-foreground">Stay Type</span>
+                                <span class="font-medium text-foreground">
+                                    @(FormData.StayType == "nightly" ? "Per Night" : "Per Month")
+                                </span>
+                            </div>
+
+                            @* Dates *@
+                            @if (FormData.CheckIn.HasValue)
+                            {
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Check-in</span>
+                                    <span class="font-medium text-foreground">@FormData.CheckIn.Value.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            }
+                            @if (FormData.CheckOut.HasValue)
+                            {
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Check-out</span>
+                                    <span class="font-medium text-foreground">@FormData.CheckOut.Value.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            }
+
+                            @* Guests *@
+                            @if (!string.IsNullOrWhiteSpace(FormData.Guests))
+                            {
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-muted-foreground">Guests</span>
+                                    <span class="font-medium text-foreground">@FormData.Guests</span>
+                                </div>
+                            }
+
+                            @* Price summary *@
+                            @if (CurrentPriceSummary is not null)
+                            {
+                                <div class="border-t border-border pt-4 mt-4">
+                                    <div class="flex justify-between gap-4 mb-2">
+                                        <span class="text-muted-foreground">
+                                            @CurrentPriceSummary.UnitCount @CurrentPriceSummary.Unit@(CurrentPriceSummary.UnitCount != 1 ? "s" : "") × KES @CurrentPriceSummary.Rate.ToString("N0")
+                                        </span>
+                                        <span class="font-medium text-foreground">
+                                            KES @CurrentPriceSummary.Subtotal.ToString("N0")
+                                        </span>
+                                    </div>
+                                    @if (CurrentPriceSummary.Unit == "month")
+                                    {
+                                        <p class="text-xs text-muted-foreground mb-2">
+                                            (@CurrentPriceSummary.Nights nights, billed monthly)
+                                        </p>
+                                    }
+                                    <div class="flex justify-between gap-4 font-semibold text-lg">
+                                        <span class="text-foreground">Total</span>
+                                        <span class="text-primary">KES @CurrentPriceSummary.Subtotal.ToString("N0")</span>
+                                    </div>
+                                </div>
+                            }
+
+                            @* Rate info *@
+                            @if (SelectedApartment is not null)
+                            {
+                                <div class="mt-6 pt-6 border-t border-border">
+                                    <h4 class="font-medium text-foreground mb-3 text-xs uppercase tracking-widest">
+                                        Rate Information
+                                    </h4>
+                                    <div class="space-y-2 text-xs text-muted-foreground">
+                                        <p>
+                                            <i class="fa-solid fa-bed text-primary mr-1"></i>
+                                            @SelectedApartment.Beds
+                                        </p>
+                                        <p>
+                                            <i class="fa-solid fa-location-dot text-primary mr-1"></i>
+                                            @SelectedApartment.Area
+                                        </p>
+                                        <p>
+                                            <i class="fa-solid fa-money-bill text-primary mr-1"></i>
+                                            Nightly: KES @SelectedApartment.NightlyRate.ToString("N0")
+                                        </p>
+                                        <p>
+                                            <i class="fa-solid fa-calendar text-primary mr-1"></i>
+                                            Monthly: KES @SelectedApartment.MonthlyRate.ToString("N0")
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    // ── Query string parameters ───────────────────────────────────────────
+    [SupplyParameterFromQuery(Name = "apartment")]
+    public string? ApartmentQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "checkIn")]
+    public string? CheckInQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "checkOut")]
+    public string? CheckOutQuery { get; set; }
+
+    // ── State ─────────────────────────────────────────────────────────────
+    private BookingForm FormData { get; set; } = new();
+    private Dictionary<string, string> Errors { get; set; } = new();
+    private bool IsSubmitting { get; set; }
+    private string? SuccessMessage { get; set; }
+
+    // ── Data ──────────────────────────────────────────────────────────────
+    private List<ApartmentListing> Apartments => ApartmentData.Apartments;
+
+    private ApartmentListing? SelectedApartment =>
+        int.TryParse(FormData.Apartment, out var id)
+            ? Apartments.FirstOrDefault(a => a.Id == id)
+            : null;
+
+    private BookingPriceSummary? CurrentPriceSummary => GetPriceSummary();
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(ApartmentQuery))
+            FormData.Apartment = ApartmentQuery;
+
+        if (DateTime.TryParse(CheckInQuery, out var checkIn))
+            FormData.CheckIn = checkIn;
+
+        if (DateTime.TryParse(CheckOutQuery, out var checkOut))
+            FormData.CheckOut = checkOut;
+    }
+
+    // ── Submit ────────────────────────────────────────────────────────────
+    private async Task HandleSubmit()
+    {
+        SuccessMessage = null;
+        Errors.Clear();
+        ValidateForm();
+
+        if (Errors.Any()) return;
+
+        IsSubmitting = true;
+        await Task.Delay(600);          // TODO: replace with real service call
+        IsSubmitting = false;
+
+        SuccessMessage = "Booking Request Submitted! We'll confirm your reservation within 24 hours.";
+        FormData = new BookingForm();
+        Errors.Clear();
+    }
+
+    // ── Validation ────────────────────────────────────────────────────────
+    private void ValidateForm()
+    {
+        if (string.IsNullOrWhiteSpace(FormData.FirstName))
+            Errors["firstName"] = "First name is required";
+
+        if (string.IsNullOrWhiteSpace(FormData.LastName))
+            Errors["lastName"] = "Last name is required";
+
+        if (string.IsNullOrWhiteSpace(FormData.Email))
+            Errors["email"] = "Email is required";
+        else if (!FormData.Email.Contains('@'))
+            Errors["email"] = "Invalid email address";
+
+        if (string.IsNullOrWhiteSpace(FormData.Phone))
+            Errors["phone"] = "Phone is required";
+
+        if (string.IsNullOrWhiteSpace(FormData.Apartment))
+            Errors["apartment"] = "Please select an apartment";
+
+        if (!FormData.CheckIn.HasValue)
+            Errors["checkIn"] = "Check-in date is required";
+        else if (FormData.CheckIn.Value.Date < DateTime.Today)
+            Errors["checkIn"] = "Check-in date must be today or later";
+
+        if (!FormData.CheckOut.HasValue)
+            Errors["checkOut"] = "Check-out date is required";
+        else if (FormData.CheckIn.HasValue && FormData.CheckOut.Value.Date <= FormData.CheckIn.Value.Date)
+            Errors["checkOut"] = "Check-out must be after check-in";
+
+        if (string.IsNullOrWhiteSpace(FormData.Guests))
+            Errors["guests"] = "Please select number of guests";
+
+        if (!string.IsNullOrWhiteSpace(FormData.SpecialRequests) && FormData.SpecialRequests.Length > 1000)
+            Errors["specialRequests"] = "Special requests must be 1000 characters or less";
+    }
+
+    // ── Price calculation ─────────────────────────────────────────────────
+    private BookingPriceSummary? GetPriceSummary()
+    {
+        if (SelectedApartment is null || !FormData.CheckIn.HasValue || !FormData.CheckOut.HasValue)
+            return null;
+
+        var nights = (FormData.CheckOut.Value.Date - FormData.CheckIn.Value.Date).Days;
+        if (nights <= 0) return null;
+
+        if (FormData.StayType == "monthly")
+        {
+            var months = Math.Max(1, (int)Math.Ceiling(nights / 30.0));
+            return new BookingPriceSummary(nights, "month", months,
+                SelectedApartment.MonthlyRate, SelectedApartment.MonthlyRate * months);
+        }
+
+        return new BookingPriceSummary(nights, "night", nights,
+            SelectedApartment.NightlyRate, SelectedApartment.NightlyRate * nights);
+    }
+
+    // ── CSS helpers ───────────────────────────────────────────────────────
+    private string InputClass(string field)
+    {
+        const string baseClass =
+            "w-full h-10 rounded-md border border-input bg-background px-3 py-2 " +
+            "text-sm text-foreground placeholder:text-muted-foreground " +
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
+
+        return Errors.ContainsKey(field) ? $"{baseClass} border-destructive" : baseClass;
+    }
+
+    private string SelectClass(string field)
+    {
+        const string baseClass =
+            "w-full h-10 rounded-md border border-input bg-background px-3 py-2 " +
+            "text-sm text-foreground " +
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
+
+        return Errors.ContainsKey(field) ? $"{baseClass} border-destructive" : baseClass;
+    }
+
+    private RenderFragment Error(string field) => builder =>
+    {
+        if (Errors.TryGetValue(field, out var msg))
+        {
+            builder.OpenElement(0, "p");
+            builder.AddAttribute(1, "class", "text-destructive text-sm mt-1");
+            builder.AddContent(2, msg);
+            builder.CloseElement();
+        }
+    };
+
+    // ── Inner types ───────────────────────────────────────────────────────
+    private sealed class BookingForm
+    {
+        public string    FirstName       { get; set; } = "";
+        public string    LastName        { get; set; } = "";
+        public string    Email           { get; set; } = "";
+        public string    Phone           { get; set; } = "";
+        public string    Apartment       { get; set; } = "";
+        public string    StayType        { get; set; } = "nightly";
+        public DateTime? CheckIn         { get; set; }
+        public DateTime? CheckOut        { get; set; }
+        public string    Guests          { get; set; } = "";
+        public string    SpecialRequests { get; set; } = "";
+    }
+
+    private sealed record BookingPriceSummary(
+        int    Nights,
+        string Unit,
+        int    UnitCount,
+        int    Rate,
+        int    Subtotal
+    );
+}

@@ -3,23 +3,20 @@
 @source "../**/*.razor";
 
 @theme {
-
-
-
   --color-primary: #747862; /*Olive Green*/
-  --color-primary-fg: #FFFFFF; /*White*/
+  --color-primary-fg: #ffffff; /*White*/
 
-  --color-accent: #F5A684; /*Peach Coral */
+  --color-accent: #f5a684; /*Peach Coral */
   --color-accent-fg: #040404; /*Black*/
 
-  --color-muted: #E8CBBA; /* light-beige */
-  --color-muted-fg: #6D6E70;/* dark-gray */
+  --color-muted: #e8cbba; /* light-beige */
+  --color-muted-fg: #6d6e70; /* dark-gray */
 
-  --color-border: #D8D0CA; /* light-gray */
-  --color-card: #F2E4DA; /* light-pink */
+  --color-border: #d8d0ca; /* light-gray */
+  --color-card: #f0ebe4; /* light */
 
-  --font-heading: "DM Serif Display", Georgia, serif;
-  --font-body: "Fira Sans", system-ui, sans-serif;
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
 
   --shadow-soft: 0 4px 20px -4px rgba(4, 4, 4, 0.08);
   --shadow-elegant: 0 10px 40px -10px rgba(4, 4, 4, 0.15);
@@ -54,14 +51,18 @@
   }
 
   .text-gradient-gold {
-    background: linear-gradient(135deg, #F5A684, #E8CBBA);
+    background: linear-gradient(135deg, #f5a684, #e8cbba);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .bg-gradient-hero {
-    background: linear-gradient(135deg, rgba(116, 120, 98, 0.9), rgba(116, 120, 98, 0.7));
+    background: linear-gradient(
+      135deg,
+      rgba(116, 120, 98, 0.9),
+      rgba(116, 120, 98, 0.7)
+    );
   }
 }
 
