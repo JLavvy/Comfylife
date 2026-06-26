@@ -1,0 +1,261 @@
+@rendermode InteractiveServer
+@using Comfylife.Frontend.Models
+@using Comfylife.Frontend.Data
+
+@* NOTE: supabase blocked_dates replaced with in-memory BlockedRange list.
+   Wire up a real service call in OnInitialized when your backend is ready. *@
+
+@if (Apartment is null)
+{
+    <div class="bg-card border border-border p-8 text-sm text-muted-foreground">Loading availability…</div>
+}
+else
+{
+    <div class="bg-card rounded-sm shadow-elegant overflow-hidden border border-border">
+
+        @* ── Header ── *@
+        <div class="bg-primary p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fas fa-calendar text-primary-foreground"></i>
+                <h3 class="font-heading text-xl text-primary-foreground">Check Availability</h3>
+            </div>
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <i class="fas fa-house text-primary-foreground/70 text-sm"></i>
+                </span>
+                <select @bind="SelectedApartmentId"
+                        class="w-full h-12 appearance-none rounded-md border border-primary-foreground/20 bg-primary-foreground/10 pl-9 pr-10 py-2 text-sm text-primary-foreground focus:outline-none focus:ring-2 focus:ring-primary-foreground/30">
+                    @foreach (var apt in Apartments)
+                    {
+                        <option value="@apt.Id" style="color:#000;background:#fff;">
+                            @apt.Name — @apt.Location
+                        </option>
+                    }
+                </select>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <i class="fas fa-chevron-down text-primary-foreground/70 text-xs"></i>
+                </span>
+            </div>
+        </div>
+
+        @* ── Month navigation ── *@
+        <div class="p-4 border-b border-border flex items-center justify-between">
+            <button @onclick="PrevMonth"
+                    disabled="@IsCurrentMonth"
+                    class="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h4 class="font-heading text-foreground">@CurrentMonth.ToString("MMMM yyyy")</h4>
+            <button @onclick="NextMonth"
+                    class="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-secondary transition-colors">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        @* ── Calendar grid ── *@
+        <div class="p-4">
+
+            @* Day-of-week headers — inline grid to bypass Tailwind v4 grid-cols-7 generation *@
+            <div class="gap-1 mb-2"
+                 style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));">
+                @foreach (var dow in new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" })
+                {
+                    <div class="text-center text-[10px] uppercase tracking-widest font-bold text-muted-foreground py-2">
+                        @dow
+                    </div>
+                }
+            </div>
+
+            @* Day cells *@
+            <div class="gap-1"
+                 style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));">
+
+                @for (int p = 0; p < StartDayOfWeek; p++)
+                {
+                    <div class="h-12"></div>
+                }
+
+                @foreach (var day in CalendarDays)
+                {
+                    var isPast     = day.Date < DateTime.Today;
+                    var isToday    = day.Date == DateTime.Today;
+                    var booked     = IsBlocked(day);
+                    var isSelected = (SelectedCheckIn.HasValue  && day.Date == SelectedCheckIn.Value.Date)
+                                  || (SelectedCheckOut.HasValue && day.Date == SelectedCheckOut.Value.Date);
+                    var inRange    = IsInRange(day);
+                    var captured   = day;
+
+                    var cellClass = "relative h-12 rounded-sm text-sm transition-all flex items-center justify-center"
+                        + (isPast     ? " text-muted-foreground/40 cursor-not-allowed" : "")
+                        + (isToday    ? " ring-1 ring-accent" : "")
+                        + (isSelected ? " bg-primary text-primary-foreground" : "")
+                        + (inRange    ? " bg-primary/20" : "")
+                        + (!isPast && !isSelected && !booked ? " hover:bg-secondary cursor-pointer" : "")
+                        + (booked     ? " bg-muted text-muted-foreground/50 line-through cursor-not-allowed" : "");
+
+                    <button @onclick="() => HandleDateClick(captured, booked)"
+                            disabled="@(isPast || booked)"
+                            class="@cellClass">
+                        @day.Day
+                    </button>
+                }
+            </div>
+
+            @* Legend *@
+            <div class="mt-4 flex flex-wrap gap-4 text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="h-3 w-3 rounded-sm bg-secondary border border-border"></div>
+                    <span class="text-muted-foreground">Available</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="h-3 w-3 rounded-sm bg-muted"></div>
+                    <span class="text-muted-foreground">Booked</span>
+                </div>
+            </div>
+        </div>
+
+        @* ── Selection summary + Book Now ── *@
+        @if (SelectedCheckIn.HasValue)
+        {
+            <div class="p-4 bg-secondary border-t border-border">
+                <div class="flex items-center justify-between mb-3 text-sm">
+                    <div>
+                        <span class="text-muted-foreground">Check-in: </span>
+                        <span class="font-medium text-foreground">@SelectedCheckIn.Value.ToString("ddd, MMM d")</span>
+                    </div>
+                    @if (SelectedCheckOut.HasValue)
+                    {
+                        <div>
+                            <span class="text-muted-foreground">Check-out: </span>
+                            <span class="font-medium text-foreground">@SelectedCheckOut.Value.ToString("ddd, MMM d")</span>
+                        </div>
+                    }
+                </div>
+
+                @if (SelectedCheckOut.HasValue)
+                {
+                    var nights       = Nights;
+                    var nightlyTotal = nights * Apartment.NightlyRate;
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-muted-foreground">
+                                @nights night@(nights != 1 ? "s" : "") × KES @Apartment.NightlyRate.ToString("N0")
+                            </span>
+                            <span class="font-semibold text-foreground">KES @nightlyTotal.ToString("N0")</span>
+                        </div>
+                        <a href="/booking?apartment=@Apartment.Id&checkIn=@SelectedCheckIn.Value.ToString("yyyy-MM-dd")&checkOut=@SelectedCheckOut.Value.ToString("yyyy-MM-dd")"
+                           class="w-full rounded-sm uppercase tracking-widest text-xs font-bold inline-flex items-center justify-center px-4 py-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors">
+                            Book Now · @nights Night@(nights != 1 ? "s" : "")
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-sm text-muted-foreground">Select check-out date</p>
+                }
+            </div>
+        }
+
+    </div>
+}
+
+@code {
+    private List<ApartmentListing> Apartments => ApartmentData.Apartments;
+
+    private int _selectedApartmentId;
+    private int SelectedApartmentId
+    {
+        get => _selectedApartmentId;
+        set
+        {
+            if (_selectedApartmentId == value) return;
+            _selectedApartmentId = value;
+            Blocks           = new List<BlockedRange>();
+            SelectedCheckIn  = null;
+            SelectedCheckOut = null;
+        }
+    }
+
+    private ApartmentListing? Apartment =>
+        Apartments.FirstOrDefault(a => a.Id == SelectedApartmentId);
+
+    private List<BlockedRange> Blocks { get; set; } = new();
+
+    private bool IsBlocked(DateTime day) =>
+        Blocks.Any(b => day.Date >= b.StartDate.Date && day.Date <= b.EndDate.Date);
+
+    private DateTime CurrentMonth { get; set; }
+
+    private bool IsCurrentMonth =>
+        CurrentMonth.Year == DateTime.Today.Year &&
+        CurrentMonth.Month == DateTime.Today.Month;
+
+    private DateTime? SelectedCheckIn  { get; set; }
+    private DateTime? SelectedCheckOut { get; set; }
+
+    private int Nights =>
+        SelectedCheckIn.HasValue && SelectedCheckOut.HasValue
+            ? (int)Math.Ceiling((SelectedCheckOut.Value - SelectedCheckIn.Value).TotalDays)
+            : 0;
+
+    private IEnumerable<DateTime> CalendarDays
+    {
+        get
+        {
+            var days = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
+            for (int d = 1; d <= days; d++)
+                yield return new DateTime(CurrentMonth.Year, CurrentMonth.Month, d);
+        }
+    }
+
+    private int StartDayOfWeek =>
+        (int)new DateTime(CurrentMonth.Year, CurrentMonth.Month, 1).DayOfWeek;
+
+    private void PrevMonth()
+    {
+        if (!IsCurrentMonth)
+            CurrentMonth = CurrentMonth.AddMonths(-1);
+    }
+
+    private void NextMonth() => CurrentMonth = CurrentMonth.AddMonths(1);
+
+    private void HandleDateClick(DateTime day, bool booked)
+    {
+        if (day.Date < DateTime.Today || booked) return;
+
+        if (!SelectedCheckIn.HasValue || (SelectedCheckIn.HasValue && SelectedCheckOut.HasValue))
+        {
+            SelectedCheckIn  = day;
+            SelectedCheckOut = null;
+        }
+        else if (day.Date < SelectedCheckIn.Value.Date)
+        {
+            SelectedCheckIn  = day;
+            SelectedCheckOut = null;
+        }
+        else
+        {
+            SelectedCheckOut = day;
+        }
+    }
+
+    private bool IsInRange(DateTime day)
+    {
+        if (!SelectedCheckIn.HasValue || !SelectedCheckOut.HasValue) return false;
+        return day.Date > SelectedCheckIn.Value.Date && day.Date < SelectedCheckOut.Value.Date;
+    }
+
+    protected override void OnInitialized()
+    {
+        CurrentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        if (Apartments.Any())
+            _selectedApartmentId = Apartments[0].Id;
+    }
+
+    private sealed class BlockedRange
+    {
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate   { get; set; }
+    }
+}
