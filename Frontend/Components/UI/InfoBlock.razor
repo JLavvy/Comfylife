@@ -1,0 +1,21 @@
+@* InfoBlock.razor — equivalent of the local `Info` helper component in the original .tsx *@
+
+<div>
+    <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@Label</p>
+    <div class="text-foreground mt-1">
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @Value
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

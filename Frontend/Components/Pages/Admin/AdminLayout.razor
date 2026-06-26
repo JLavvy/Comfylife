@@ -2,8 +2,8 @@
 @layout MinimalLayout
 @inject NavigationManager Nav
 
-<div class="h-screen w-screen overflow-hidden flex bg-white">
-    <aside class="@(_collapsed ? "w-20" : "w-72") h-full border-r border-border flex flex-col shrink-0 transition-all duration-200 bg-sidebar text-sidebar-foreground">
+<div class="h-screen w-screen flex overflow-hidden bg-white">
+    <aside class="@(_collapsed ? "w-20" : "w-150") h-screen shrink-0 overflow-hidden border-r border-border flex flex-col transition-all duration-200 bg-sidebar text-sidebar-foreground">
 
         <div class="border-b border-sidebar-border px-5 py-5 shrink-0">
             @if (!_collapsed)
@@ -21,7 +21,7 @@
             }
         </div>
 
-        <div class="flex-1 py-3 overflow-y-auto">
+        <div class="flex-1 min-h-0 overflow-y-auto py-3">
             @if (!_collapsed)
             {
                 <p class="px-5 py-2 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
@@ -76,7 +76,7 @@
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+    <div class="flex-1 flex flex-col h-screen min-h-0 min-w-0 overflow-hidden">
 
         <header class="h-14 shrink-0 border-b border-border bg-card flex items-center gap-3 px-4 z-30">
             <button @onclick="ToggleSidebar" class="p-2 rounded hover:bg-muted">
@@ -90,7 +90,7 @@
             </span>
         </header>
 
-        <main class="flex-1 overflow-y-auto bg-gray-50/50">
+        <main class="flex-1 min-h-0 overflow-y-auto bg-gray-50/50">
             <div class="p-6 lg:p-10 max-w-7xl w-full mx-auto">
                 @Body
             </div>
@@ -106,16 +106,22 @@
 
     private readonly List<NavItem> _nav = new()
     {
-        new("/admin",               "Dashboard",    "fas fa-gauge",          End: true),
-        new("/admin/bookings",      "Bookings",     "fas fa-calendar-check"),
-        new("/admin/listings",      "Listings",     "fas fa-house"),
-        new("/admin/availability",  "Availability", "fas fa-calendar-xmark"),
-        new("/admin/inquiries",     "Inquiries",    "fas fa-inbox"),
-        new("/admin/users",         "Users",        "fas fa-users"),
-        new("/admin/analytics",     "Analytics",    "fas fa-chart-bar"),
+        new("/admin",              "Dashboard",    "fas fa-gauge",           End: true),
+        new("/admin/bookings",     "Bookings",     "fas fa-calendar-check"),
+        new("/admin/listings",     "Listings",     "fas fa-house"),
+        new("/admin/availability", "Availability", "fas fa-calendar-xmark"),
+        new("/admin/inquiries",    "Inquiries",    "fas fa-inbox"),
+        new("/admin/users",        "Users",        "fas fa-users"),
+        new("/admin/analytics",    "Analytics",    "fas fa-chart-bar"),
     };
 
-    private void ToggleSidebar() => _collapsed = !_collapsed;
+    private void ToggleSidebar()
+    {
+        _collapsed = !_collapsed;
+    }
 
-    private void SignOut() => Nav.NavigateTo("/");
+    private void SignOut()
+    {
+        Nav.NavigateTo("/");
+    }
 }

@@ -50,6 +50,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminListing.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkxpc3RpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Amenities.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbWVuaXRpZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -84,6 +88,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/UI/AvailabilityCalendar.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxBdmFpbGFiaWxpdHlDYWxlbmRhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/UI/InfoBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbmZvQmxvY2sucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/UI/InfoField.razor]
