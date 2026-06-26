@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Comfylife.Frontend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+96fbcbf2bf0ce6244f096372b419a54119a76d4f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5efc8b7158fb31e07277ab44329c0e93882284d3")]
 [assembly: System.Reflection.AssemblyProductAttribute("Comfylife.Frontend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Comfylife.Frontend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
