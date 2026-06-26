@@ -1,10 +1,10 @@
-<div class="bg-background flex flex-col items-start gap-1 p-5">
+<div class="bg-white min-w-0 flex flex-col items-start justify-center gap-2 p-5 rounded-sm border border-border">
     <div class="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-        <i class="@($"{Icon} h-3.5 w-3.5 text-accent")"></i>
-        @Label
+        <i class="@($"{Icon} text-accent")"></i>
+        <span>@Label</span>
     </div>
 
-    <span class="font-heading text-lg text-primary">
+    <span class="font-heading font-semibold text-xl text-primary leading-tight break-words">
         @Value
     </span>
 </div>

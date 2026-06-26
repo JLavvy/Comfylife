@@ -1,0 +1,121 @@
+@inherits LayoutComponentBase
+@layout MinimalLayout
+@inject NavigationManager Nav
+
+<div class="h-screen w-screen overflow-hidden flex bg-white">
+    <aside class="@(_collapsed ? "w-20" : "w-72") h-full border-r border-border flex flex-col shrink-0 transition-all duration-200 bg-sidebar text-sidebar-foreground">
+
+        <div class="border-b border-sidebar-border px-5 py-5 shrink-0">
+            @if (!_collapsed)
+            {
+                <a href="/admin">
+                    <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold">ComfyLife</p>
+                    <h2 class="font-heading text-2xl text-sidebar-foreground">Admin Console</h2>
+                </a>
+            }
+            else
+            {
+                <div class="flex justify-center">
+                    <i class="fas fa-shield-halved text-accent text-xl"></i>
+                </div>
+            }
+        </div>
+
+        <div class="flex-1 py-3 overflow-y-auto">
+            @if (!_collapsed)
+            {
+                <p class="px-5 py-2 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                    Manage
+                </p>
+            }
+
+            <ul>
+                @foreach (var n in _nav)
+                {
+                    <li>
+                        <NavLink href="@n.To"
+                                 Match="@(n.End ? NavLinkMatch.All : NavLinkMatch.Prefix)"
+                                 class="flex items-center gap-3 px-5 py-3 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                                 ActiveClass="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+                            <i class="@n.Icon w-5 text-center"></i>
+
+                            @if (!_collapsed)
+                            {
+                                <span>@n.Label</span>
+                            }
+                        </NavLink>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div class="border-t border-sidebar-border p-4 space-y-3 shrink-0">
+            <a href="/" class="flex items-center gap-3 text-xs text-muted-foreground hover:text-primary px-2">
+                <i class="fas fa-arrow-up-right-from-square text-[11px]"></i>
+                @if (!_collapsed)
+                {
+                    <span>View site</span>
+                }
+            </a>
+
+            <button @onclick="SignOut"
+                    class="flex items-center gap-3 text-xs text-muted-foreground hover:text-destructive px-2">
+                <i class="fas fa-right-from-bracket text-[11px]"></i>
+                @if (!_collapsed)
+                {
+                    <span>Sign out</span>
+                }
+            </button>
+
+            @if (!_collapsed)
+            {
+                <p class="text-[10px] text-muted-foreground px-2 truncate">
+                    admin@comfylife.co.ke
+                </p>
+            }
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+
+        <header class="h-14 shrink-0 border-b border-border bg-card flex items-center gap-3 px-4 z-30">
+            <button @onclick="ToggleSidebar" class="p-2 rounded hover:bg-muted">
+                <i class="fas fa-bars text-sm text-muted-foreground"></i>
+            </button>
+
+            <div class="flex-1"></div>
+
+            <span class="text-xs text-muted-foreground hidden sm:inline">
+                admin@comfylife.co.ke
+            </span>
+        </header>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50/50">
+            <div class="p-6 lg:p-10 max-w-7xl w-full mx-auto">
+                @Body
+            </div>
+        </main>
+
+    </div>
+</div>
+
+@code {
+    private bool _collapsed;
+
+    private record NavItem(string To, string Label, string Icon, bool End = false);
+
+    private readonly List<NavItem> _nav = new()
+    {
+        new("/admin",               "Dashboard",    "fas fa-gauge",          End: true),
+        new("/admin/bookings",      "Bookings",     "fas fa-calendar-check"),
+        new("/admin/listings",      "Listings",     "fas fa-house"),
+        new("/admin/availability",  "Availability", "fas fa-calendar-xmark"),
+        new("/admin/inquiries",     "Inquiries",    "fas fa-inbox"),
+        new("/admin/users",         "Users",        "fas fa-users"),
+        new("/admin/analytics",     "Analytics",    "fas fa-chart-bar"),
+    };
+
+    private void ToggleSidebar() => _collapsed = !_collapsed;
+
+    private void SignOut() => Nav.NavigateTo("/");
+}

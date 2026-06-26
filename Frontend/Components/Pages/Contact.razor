@@ -1,81 +1,86 @@
 @page "/contact"
 
-<div>
+<div class="min-h-screen bg-[#f8f5f0]">
     <PageHero Eyebrow="We're Here"
               Title="Get In Touch"
               Highlight="Touch"
               Description="Have a question, special request, or planning a longer stay? Our concierge team is one message away." />
 
-    <section class="py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-12 gap-12 lg:gap-16">
+    <section class="py-20 bg-white relative overflow-hidden">
+        <!-- Subtle background pattern -->
+        <div class="absolute inset-0 bg-[radial-gradient(#e5d9c0_0.8px,transparent_0.8px)] [background-size:40px_40px] opacity-30"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 md:px-8 lg:px-8 grid lg:grid-cols-12 gap-12 lg:gap-20 relative">
+            
+            <!-- Contact Info Sidebar -->
+            <div class="lg:col-span-5 space-y-12">
+                <div class="sticky top-12">
+                    <div class="mb-10">
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
+                            CONTACT US
+                        </p>
+                        <h2 class="font-heading text-5xl text-primary leading-[1.05] mb-6">
+                            Let's connect<span class="text-accent">.</span>
+                        </h2>
+                        <p class="text-muted-foreground text-lg leading-relaxed max-w-md mb-6">
+                            Our team is ready to assist with your stay, events, or any special requests. Expect a personal reply within hours.
+                        </p>
+                    </div>
 
-            <div class="lg:col-span-5 space-y-10">
-                <div>
-                    <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">
-                        Contact
-                    </p>
+                    <div class="space-y-8 ">
+                        @foreach (var c in ContactInfo)
+                        {
+                            <div @key="c.Label" class="group flex items-start gap-6 border-l-2 border-transparent hover:border-accent pl-6 transition-all duration-300">
+                                <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-1 group-hover:bg-accent/20 transition-colors">
+                                    <i class="@($"{c.Icon} text-accent text-xl")"></i>
+                                </div>
 
-                    <h2 class="font-heading text-4xl text-primary leading-tight mb-4">
-                        Drop us a <span class="italic">line</span>
-                    </h2>
-
-                    <p class="text-muted-foreground leading-relaxed">
-                        Whether it's an apartment inquiry, amenities question, or a bespoke booking — we'll respond personally within hours.
-                    </p>
-                </div>
-
-                <div>
-                    @foreach (var c in ContactInfo)
-                    {
-                        <div @key="c.Label" class="flex items-start gap-5 px-6 py-5 border-y border-border">
-                            <i class="@($"{c.Icon} text-accent shrink-0 mt-0.5 text-sm")"></i>
-
-                            <div>
-                                <p class="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground mb-1">
-                                    @c.Label
-                                </p>
-
-                                @if (!string.IsNullOrWhiteSpace(c.Href))
-                                {
-                                    <a href="@c.Href" class="text-sm text-foreground hover:text-accent transition-colors">
-                                        @c.Value
-                                    </a>
-                                }
-                                else
-                                {
-                                    <p class="text-sm text-foreground whitespace-pre-line leading-relaxed">
-                                        @c.Value
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.3em] font-semibold text-muted-foreground mb-1.5">
+                                        @c.Label
                                     </p>
-                                }
+                                    @if (!string.IsNullOrWhiteSpace(c.Href))
+                                    {
+                                        <a href="@c.Href" 
+                                           class="block text-foreground hover:text-accent text-[17px] leading-tight transition-colors">
+                                            @c.Value
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-foreground text-[17px] leading-tight whitespace-pre-line">
+                                            @c.Value
+                                        </p>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
+
+                    
                 </div>
             </div>
 
+            <!-- Form -->
             <div class="lg:col-span-7">
                 @if (IsSubmitted)
                 {
-                    <div class="border border-border bg-[#f7f2ee] px-6 sm:px-10 lg:px-14 py-12 lg:py-16 font-body">
-                        <div class="flex flex-col items-start gap-3 py-10">
-                            <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                                <i class="fa-solid fa-check text-accent text-sm"></i>
-                            </div>
-
-                            <h3 class="font-heading text-3xl text-primary">
-                                Message received
-                            </h3>
-
-                            <p class="text-muted-foreground text-sm leading-relaxed max-w-sm">
-                                Thank you for reaching out. A member of our concierge team will be in touch within a few hours.
-                            </p>
-
-                            <button type="button"
-                                    @onclick="ResetForm"
-                                    class="mt-4 text-[10px] uppercase tracking-[0.3em] font-bold text-accent hover:text-primary transition-colors">
-                                Send another message
-                            </button>
+                    <div class="border border-accent/20 bg-gradient-to-br from-[#f7f2ee] to-white px-10 py-16 lg:py-20 rounded-3xl text-center">
+                        <div class="mx-auto w-20 h-20 rounded-2xl bg-accent/10 flex items-center justify-center mb-8">
+                            <i class="fa-solid fa-check text-5xl text-accent"></i>
                         </div>
+                        
+                        <h3 class="font-heading text-5xl text-primary mb-4">Thank you.</h3>
+                        <p class="text-xl text-muted-foreground max-w-sm mx-auto">
+                            Your message has been received. A member of our concierge team will reach out shortly.
+                        </p>
+                        
+                        <button type="button"
+                                @onclick="ResetForm"
+                                class="mt-10 text-sm uppercase tracking-widest font-bold text-accent hover:text-primary flex items-center gap-2 mx-auto group">
+                            <span>Send another message</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                        </button>
                     </div>
                 }
                 else
@@ -83,99 +88,102 @@
                     <EditForm Model="@FormData" OnValidSubmit="@HandleSubmit" FormName="ContactForm">
                         <DataAnnotationsValidator />
 
-                        <div class="border border-border rounded-sm bg-[#f7f2ee] px-6 sm:px-10 lg:px-14 py-12 lg:py-16 font-body">
-                            <p class="text-[10px] uppercase tracking-[0.45em] text-accent font-bold mb-6">
-                                Send a Message
-                            </p>
+                        <div class="bg-white border border-border rounded-3xl px-10 lg:px-16 py-12 lg:py-18 shadow-sm">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="w-2.5 h-2.5 bg-accent rounded-full animate-pulse"></div>
+                                <p class="uppercase text-xs tracking-[0.125em] font-semibold text-accent">Send a Message</p>
+                            </div>
 
-                            <h2 class="font-heading text-4xl lg:text-5xl text-primary leading-tight mb-12">
-                                Let's start a <span class="italic">conversation</span>
+                            <h2 class="font-heading text-5xl lg:text-6xl leading-none text-primary mb-14">
+                                Start the <span class="italic text-accent">conversation</span>
                             </h2>
 
                             <div class="space-y-6">
-                                <div class="grid md:grid-cols-2 gap-4 min-w-0">
+                                <!-- Name + Email -->
+                                <div class="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-[10px] uppercase tracking-[0.35em] font-bold text-muted-foreground mb-3">
+                                        <label class="block text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
                                             Full Name <span class="text-accent">*</span>
                                         </label>
-
                                         <InputText @bind-Value="FormData.Name"
+                                                   placeholder="Alexandra Rivera"
                                                    class="@InputClass("name")" />
-
                                         @if (Errors.ContainsKey("name"))
                                         {
-                                            <p class="text-red-500 text-xs mt-2">@Errors["name"]</p>
+                                            <p class="text-red-500 text-sm mt-2">@Errors["name"]</p>
                                         }
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] uppercase tracking-[0.35em] font-bold text-muted-foreground mb-3">
-                                            Email <span class="text-accent">*</span>
+                                        <label class="block text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
+                                            Email Address <span class="text-accent">*</span>
                                         </label>
-
                                         <InputText type="email"
                                                    @bind-Value="FormData.Email"
+                                                   placeholder="hello@youremail.com"
                                                    class="@InputClass("email")" />
-
                                         @if (Errors.ContainsKey("email"))
                                         {
-                                            <p class="text-red-500 text-xs mt-2">@Errors["email"]</p>
+                                            <p class="text-red-500 text-sm mt-2">@Errors["email"]</p>
                                         }
                                     </div>
                                 </div>
 
-                                <div class="grid md:grid-cols-2 gap-4 min-w-0">
+                                <!-- Phone + Subject -->
+                                <div class="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-[10px] uppercase tracking-[0.35em] font-bold text-muted-foreground mb-3">
-                                            Phone
+                                        <label class="block text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
+                                            Phone Number
                                         </label>
-
                                         <InputText type="tel"
                                                    @bind-Value="FormData.Phone"
-                                                   class="w-full h-12 bg-white border border-border rounded-sm px-4 text-sm text-foreground outline-none focus:border-accent transition-colors" />
+                                                   placeholder="(480) 555-0123"
+                                                   class="w-full h-14 bg-white border border-border focus:border-accent rounded-2xl px-6 text-base outline-none transition-all" />
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] uppercase tracking-[0.35em] font-bold text-muted-foreground mb-3">
+                                        <label class="block text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
                                             Subject <span class="text-accent">*</span>
                                         </label>
-
                                         <InputText @bind-Value="FormData.Subject"
+                                                   placeholder="Wedding inquiry • October 2026"
                                                    class="@InputClass("subject")" />
-
                                         @if (Errors.ContainsKey("subject"))
                                         {
-                                            <p class="text-red-500 text-xs mt-2">@Errors["subject"]</p>
+                                            <p class="text-red-500 text-sm mt-2">@Errors["subject"]</p>
                                         }
                                     </div>
                                 </div>
 
+                                <!-- Message -->
                                 <div>
-                                    <label class="block text-[10px] uppercase tracking-[0.35em] font-bold text-muted-foreground mb-3">
-                                        Message <span class="text-accent">*</span>
+                                    <label class="block text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
+                                        Your Message <span class="text-accent">*</span>
                                     </label>
-
                                     <InputTextArea @bind-Value="FormData.Message"
-                                                   rows="6"
+                                                   rows="7"
+                                                   placeholder="Hi, I'd love to learn more about your villas for a family reunion..."
                                                    class="@TextAreaClass()" />
-
                                     @if (Errors.ContainsKey("message"))
                                     {
-                                        <p class="text-red-500 text-xs mt-2">@Errors["message"]</p>
+                                        <p class="text-red-500 text-sm mt-2">@Errors["message"]</p>
                                     }
                                 </div>
 
                                 <button type="submit"
                                         disabled="@IsSubmitting"
-                                        class="w-full h-15 bg-primary px-6 py-4 text-primary-foreground text-[10px] uppercase tracking-[0.35em] font-bold rounded-sm hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                                    @(IsSubmitting ? "Sending…" : "Send Message")
+                                        class="w-full h-16 mt-6 bg-primary hover:bg-primary/90 active:scale-[0.985] text-primary-foreground text-sm uppercase tracking-[0.125em] font-bold rounded-2xl transition-all duration-300 disabled:opacity-70">
+                                    @(IsSubmitting ? "Sending your message..." : "Send Message")
                                 </button>
                             </div>
+
+                            <p class="text-center text-[10px] text-muted-foreground mt-8">
+                                We respect your inbox. Replies typically within 2–4 hours.
+                            </p>
                         </div>
                     </EditForm>
                 }
             </div>
-
         </div>
     </section>
 </div>
@@ -196,16 +204,14 @@
 
     private string InputClass(string field)
     {
-        var border = Errors.ContainsKey(field) ? "border-red-500" : "border-border";
-
-        return $"w-full h-12 bg-white border {border} rounded-sm px-4 text-sm text-foreground outline-none focus:border-accent transition-colors";
+        var border = Errors.ContainsKey(field) ? "border-red-500 focus:border-red-500" : "border-border focus:border-accent";
+        return $"w-full h-14 bg-white border {border} rounded-2xl px-6 text-base outline-none transition-all duration-200";
     }
 
     private string TextAreaClass()
     {
-        var border = Errors.ContainsKey("message") ? "border-red-500" : "border-border";
-
-        return $"w-full bg-white border {border} rounded-sm px-4 py-3 text-sm text-foreground outline-none focus:border-accent transition-colors resize-y";
+        var border = Errors.ContainsKey("message") ? "border-red-500 focus:border-red-500" : "border-border focus:border-accent";
+        return $"w-full bg-white border {border} rounded-3xl px-6 py-5 text-base outline-none resize-y min-h-[160px] transition-all duration-200";
     }
 
     private async Task HandleSubmit()
@@ -228,11 +234,14 @@
             return;
 
         IsSubmitting = true;
+        StateHasChanged();
 
-        await Task.Delay(1000);
+        // Simulate API call
+        await Task.Delay(1200);
 
         IsSubmitting = false;
         IsSubmitted = true;
+        StateHasChanged();
     }
 
     private void ResetForm()

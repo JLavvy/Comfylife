@@ -26,12 +26,28 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Layout/MinimalLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWluaW1hbExheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Layout/PageHero.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcUGFnZUhlcm8ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/About.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBYm91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminBookingsPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkJvb2tpbmdzUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminDashboardPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkRhc2hib2FyZFBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Amenities.razor]
@@ -60,6 +76,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/UI/InfoField.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbmZvRmllbGQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/UI/InquiryForm.razor]

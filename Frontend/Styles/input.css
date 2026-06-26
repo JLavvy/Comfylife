@@ -2,15 +2,16 @@
 
 @source "../**/*.razor";
 
+
 @theme {
   --color-primary: #747862; /*Olive Green*/
-  --color-primary-fg: #ffffff; /*White*/
+  --color-primary-foreground: #ffffff; /*White*/
 
   --color-accent: #f5a684; /*Peach Coral */
-  --color-accent-fg: #040404; /*Black*/
+  --color-accent-foreground: #040404; /*Black*/
 
   --color-muted: #e8cbba; /* light-beige */
-  --color-muted-fg: #6d6e70; /* dark-gray */
+  --color-muted-foreground: #6d6e70; /* dark-gray */
 
   --color-border: #d8d0ca; /* light-gray */
   --color-card: #f0ebe4; /* light */
@@ -26,6 +27,14 @@
   html {
     scroll-behavior: smooth;
   }
+  
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+  
 
   h1,
   h2,

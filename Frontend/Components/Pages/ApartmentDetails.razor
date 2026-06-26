@@ -7,10 +7,9 @@
 
 @if (apartment == null)
 {
-    <div class="min-h-[60vh] flex items-center justify-center">
+    <div class="min-h-[60vh] flex items-center justify-center px-4">
         <div class="text-center">
             <h1 class="font-heading text-3xl text-primary mb-6">Apartment Not Found</h1>
-
             <a href="/apartments"
                class="inline-flex items-center justify-center rounded-sm uppercase tracking-widest text-xs font-bold bg-primary text-primary-foreground h-10 px-4 py-2">
                 View All Apartments
@@ -23,77 +22,66 @@ else
     <div class="bg-white">
 
         <!-- Header -->
-        <div class="bg-muted/30 border-b border-border py-12">
-            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+        <div class="bg-muted/30 border-b border-border mb-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-8 py-8 md:py-10 lg:py-12">
 
-                <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-10">
+                <nav class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-6 lg:mb-10">
                     <a href="/" class="hover:text-accent transition-colors">Home</a>
                     <i class="fa-solid fa-chevron-right text-[8px]"></i>
                     <a href="/apartments" class="hover:text-accent transition-colors">Apartments</a>
                     <i class="fa-solid fa-chevron-right text-[8px]"></i>
-                    <span class="text-accent">@apartment.Name</span>
+                    <span class="text-accent truncate">@apartment.Name</span>
                 </nav>
 
-                <div class="grid lg:grid-cols-2 gap-8 items-end py-4">
-
+                <div class="flex flex-col flex-row items-end justify-between gap-6">
                     <div>
-                        <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-accent mb-4">
-                            <span class="h-px w-10 bg-accent"></span>
+                        <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-accent mb-3">
+                            <span class="h-px w-10 bg-accent shrink-0"></span>
                             @apartment.Tagline
                         </div>
-
-                        <h1 class="font-heading text-5xl lg:text-6xl text-primary leading-[0.95] mb-4">
+                        <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl text-primary leading-[0.95] mb-3">
                             @apartment.Name
                         </h1>
-
                         <p class="flex items-center gap-2 text-sm text-muted-foreground">
-                            <i class="fa-solid fa-location-dot text-accent"></i>
+                            <i class="fa-solid fa-location-dot text-accent shrink-0"></i>
                             @apartment.Location • @apartment.Size • @apartment.Floor
                         </p>
                     </div>
 
-                    <div class="lg:text-right">
-                        <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">
-                            Per Night
-                        </p>
-
-                        <div class="font-heading text-4xl lg:text-5xl text-primary leading-none">
+                    <div class="text-right shrink-0">
+                        <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Per Night</p>
+                        <div class="font-heading text-3xl sm:text-4xl lg:text-5xl text-primary leading-none">
                             KES @apartment.NightlyRate.ToString("N0")
                             <span class="text-base text-muted-foreground font-body">/night</span>
                         </div>
-
                         <p class="text-xs text-muted-foreground mt-2">
                             or KES @apartment.MonthlyRate.ToString("N0")/month
                         </p>
                     </div>
-
                 </div>
+
             </div>
         </div>
 
         <!-- Hero Image + Thumbnails -->
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-10 e">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
 
-            <div class="relative rounded-sm overflow-hidden border bg-white border-border bg-muted">
+            <div class="relative rounded-sm overflow-hidden border border-border bg-muted" style="height:clamp(220px,45vw,500px);">
                 <img src="@GalleryImages[selectedImageIndex]"
                      alt="@apartment.Name"
-                     class="max-w-5xl h-full object-cover " />
+                     class="w-full h-full object-cover" />
 
                 @if (GalleryImages.Count > 1)
                 {
-                    <button type="button"
-                            @onclick="PrevImage"
-                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center rounded-sm">
-                        <i class="fa-solid fa-chevron-left"></i>
+                    <button type="button" @onclick="PrevImage"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center rounded-sm">
+                        <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
-
-                    <button type="button"
-                            @onclick="NextImage"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center rounded-sm">
-                        <i class="fa-solid fa-chevron-right"></i>
+                    <button type="button" @onclick="NextImage"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/70 text-white flex items-center justify-center rounded-sm">
+                        <i class="fa-solid fa-chevron-right text-sm"></i>
                     </button>
-
-                    <div class="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-sm">
+                    <div class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-sm">
                         @(selectedImageIndex + 1) / @GalleryImages.Count
                     </div>
                 }
@@ -101,17 +89,14 @@ else
 
             @if (GalleryImages.Count > 1)
             {
-                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 mt-4">
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:0.5rem; margin-top:0.75rem;">
                     @for (int i = 0; i < GalleryImages.Count; i++)
                     {
                         var index = i;
-
-                        <button type="button"
-                                @onclick="() => SelectImage(index)"
-                                class="@GetThumbnailClass(index)">
+                        <button type="button" @onclick="() => SelectImage(index)" class="@GetThumbnailClass(index)">
                             <img src="@GalleryImages[index]"
                                  alt="@($"{apartment.Name} image {index + 1}")"
-                                 class="max-w-[250px]  h-full object-cover"
+                                 class="w-full h-full object-cover"
                                  loading="lazy" />
                         </button>
                     }
@@ -121,78 +106,160 @@ else
         </div>
 
         <!-- Body -->
-        <section class="py-20">
-            <div class="max-w-7xl mx-auto px-6 lg:px-8">
-                <div class="grid lg:grid-cols-3 gap-12">
+        <section class="py-12 lg:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                    <div class="lg:col-span-2 space-y-16">
+                <!-- ── MOBILE layout (< lg) ── -->
+                <div class="space-y-10 lg:hidden">
 
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-px bg-border border border-border">
-                            <Stat Icon="fa-users" Label="Guests" Value="@apartment.MaxGuests.ToString()" />
-                            <Stat Icon="fa-bed" Label="Beds" Value="@apartment.Beds" />
-                            <Stat Icon="fa-bath" Label="Baths" Value="@apartment.Bathrooms.ToString()" />
-                            <Stat Icon="fa-maximize" Label="Size" Value="@apartment.Size" />
-                            <Stat Icon="fa-building" Label="Floor" Value="@apartment.Floor" />
+                    <InquiryForm ApartmentName="@apartment.Name" />
+
+                    <a href="@($"/booking?apartment={apartment.Id}")"
+                       class="inline-flex items-center justify-center w-full rounded-sm uppercase tracking-widest text-xs font-bold bg-primary text-primary-foreground px-6 py-4">
+                        Continue to Booking
+                    </a>
+
+                    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px;"
+                         class="bg-border border border-border overflow-hidden mt-10">
+                        <Stat Icon="fa-solid fa-users" Label="Guests" Value="@apartment.MaxGuests.ToString()" />
+                        <Stat Icon="fa-solid fa-bed" Label="Beds" Value="@apartment.Beds" />
+                        <Stat Icon="fa-solid fa-bath" Label="Baths" Value="@apartment.Bathrooms.ToString()" />
+                        <Stat Icon="fa-solid fa-maximize" Label="Size" Value="@apartment.Size" />
+                        <Stat Icon="fa-solid fa-building" Label="Floor" Value="@apartment.Floor" />
+                    </div>
+
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Overview</p>
+                        <h2 class="font-heading text-3xl text-primary mb-4 leading-tight">
+                            About this <span class="italic">apartment</span>
+                        </h2>
+                        <p class="text-foreground/70 leading-relaxed">@apartment.LongDescription</p>
+                    </div>
+
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">In the apartment</p>
+                        <h2 class="font-heading text-3xl text-primary mb-6 leading-tight">Amenities</h2>
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.5rem 1.5rem;">
+                            @foreach (var amenity in apartment.Amenities)
+                            {
+                                <div class="flex items-center gap-2 text-sm text-foreground">
+                                    <i class="fa-solid fa-check text-accent shrink-0"></i>
+                                    @amenity
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Building &amp; Security</p>
+                        <h2 class="font-heading text-3xl text-primary mb-6 leading-tight">Features</h2>
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.5rem 1.5rem;">
+                            @foreach (var feature in apartment.Features)
+                            {
+                                <div class="flex items-center gap-2 text-sm text-foreground">
+                                    <i class="fa-solid fa-check text-accent shrink-0"></i>
+                                    @feature
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Rates</p>
+                        <h2 class="font-heading text-3xl text-primary mb-6 leading-tight">Pricing (KES)</h2>
+                        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px;"
+                             class="bg-border border border-border overflow-hidden">
+                            <div class="bg-background p-6">
+                                <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Per Night</p>
+                                <p class="font-heading text-3xl text-primary">KES @apartment.NightlyRate.ToString("N0")</p>
+                                <p class="text-xs text-muted-foreground mt-2">Minimum 1 night stay</p>
+                            </div>
+                            <div class="bg-background p-6">
+                                <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Per Month</p>
+                                <p class="font-heading text-3xl text-primary">KES @apartment.MonthlyRate.ToString("N0")</p>
+                                <p class="text-xs text-muted-foreground mt-2">Best value for extended stays</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-border p-6">
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-4">Quick info</p>
+                        <ul class="space-y-3 text-sm">
+                            @foreach (var item in QuickInfo)
+                            {
+                                <li class="flex justify-between border-b border-border last:border-0 pb-2">
+                                    <span class="text-muted-foreground">@item.Key</span>
+                                    <span class="text-foreground font-medium text-right">@item.Value</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- ── DESKTOP layout (lg+) ── -->
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:3rem; align-items:start;" class="hidden lg:grid">
+
+                    <div style="grid-column:span 2;" class="space-y-16">
+
+                        <div style="display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1px;"
+                             class="bg-border border border-border overflow-hidden">
+                            <Stat Icon="fa-solid fa-users" Label="Guests" Value="@apartment.MaxGuests.ToString()" />
+                            <Stat Icon="fa-solid fa-bed" Label="Beds" Value="@apartment.Beds" />
+                            <Stat Icon="fa-solid fa-bath" Label="Baths" Value="@apartment.Bathrooms.ToString()" />
+                            <Stat Icon="fa-solid fa-maximize" Label="Size" Value="@apartment.Size" />
+                            <Stat Icon="fa-solid fa-building" Label="Floor" Value="@apartment.Floor" />
                         </div>
 
-                        <section>
+                        <section mt-12>
                             <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Overview</p>
                             <h2 class="font-heading text-4xl text-primary mb-6 leading-tight">
                                 About this <span class="italic">apartment</span>
                             </h2>
-                            <p class="text-foreground/70 leading-relaxed text-lg">
-                                @apartment.LongDescription
-                            </p>
+                            <p class="text-foreground/70 leading-relaxed text-lg">@apartment.LongDescription</p>
                         </section>
 
-                        <section>
+                        <section mt-12>
                             <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">In the apartment</p>
                             <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">Amenities</h2>
-
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                            <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0.75rem 1.5rem;">
                                 @foreach (var amenity in apartment.Amenities)
                                 {
                                     <div class="flex items-center gap-2 text-sm text-foreground">
-                                        <i class="fa-solid fa-check h-4 w-4 text-accent shrink-0"></i>
+                                        <i class="fa-solid fa-check text-accent shrink-0"></i>
                                         @amenity
                                     </div>
                                 }
                             </div>
                         </section>
 
-                        <section>
+                        <section mt-12>
                             <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Building &amp; Security</p>
                             <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">Features</h2>
-
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                            <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0.75rem 1.5rem;">
                                 @foreach (var feature in apartment.Features)
                                 {
                                     <div class="flex items-center gap-2 text-sm text-foreground">
-                                        <i class="fa-solid fa-check h-4 w-4 text-accent shrink-0"></i>
+                                        <i class="fa-solid fa-check text-accent shrink-0"></i>
                                         @feature
                                     </div>
                                 }
                             </div>
                         </section>
 
-                        <section>
+                        <section mt-12>
                             <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Rates</p>
                             <h2 class="font-heading text-4xl text-primary mb-8 leading-tight">Pricing (KES)</h2>
-
-                            <div class="grid sm:grid-cols-2 gap-px bg-border border border-border">
+                            <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px;"
+                                 class="bg-border border border-border overflow-hidden">
                                 <div class="bg-background p-8">
                                     <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Per Night</p>
-                                    <p class="font-heading text-4xl text-primary">
-                                        KES @apartment.NightlyRate.ToString("N0")
-                                    </p>
+                                    <p class="font-heading text-4xl text-primary">KES @apartment.NightlyRate.ToString("N0")</p>
                                     <p class="text-xs text-muted-foreground mt-2">Minimum 1 night stay</p>
                                 </div>
-
                                 <div class="bg-background p-8">
                                     <p class="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Per Month</p>
-                                    <p class="font-heading text-4xl text-primary">
-                                        KES @apartment.MonthlyRate.ToString("N0")
-                                    </p>
+                                    <p class="font-heading text-4xl text-primary">KES @apartment.MonthlyRate.ToString("N0")</p>
                                     <p class="text-xs text-muted-foreground mt-2">Best value for extended stays</p>
                                 </div>
                             </div>
@@ -200,20 +267,17 @@ else
 
                     </div>
 
-                    <aside class="lg:col-span-1">
+                    <aside style="grid-column:span 1;">
                         <div class="sticky top-24 space-y-4">
                             <InquiryForm ApartmentName="@apartment.Name" />
 
                             <a href="@($"/booking?apartment={apartment.Id}")"
-                               class="inline-flex items-center justify-center w-full rounded-sm uppercase tracking-widest text-xs font-bold bg-primary text-primary-foreground h-11 px-8">
+                               class="inline-flex items-center justify-center w-full rounded-sm uppercase tracking-widest text-xs font-bold bg-primary text-primary-foreground px-6 py-4">
                                 Continue to Booking
                             </a>
 
                             <div class="border border-border p-6">
-                                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-4">
-                                    Quick info
-                                </p>
-
+                                <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-4">Quick info</p>
                                 <ul class="space-y-3 text-sm">
                                     @foreach (var item in QuickInfo)
                                     {
@@ -228,6 +292,7 @@ else
                     </aside>
 
                 </div>
+
             </div>
         </section>
 
@@ -272,21 +337,13 @@ else
 
     private void PrevImage()
     {
-        if (GalleryImages.Count == 0)
-        {
-            return;
-        }
-
+        if (GalleryImages.Count == 0) return;
         selectedImageIndex = (selectedImageIndex - 1 + GalleryImages.Count) % GalleryImages.Count;
     }
 
     private void NextImage()
     {
-        if (GalleryImages.Count == 0)
-        {
-            return;
-        }
-
+        if (GalleryImages.Count == 0) return;
         selectedImageIndex = (selectedImageIndex + 1) % GalleryImages.Count;
     }
 
@@ -296,6 +353,6 @@ else
             ? "border-accent"
             : "border-transparent hover:border-accent/50";
 
-        return $"h-20 lg:h-24 rounded-sm overflow-hidden border-2 transition-all focus:outline-none {borderClass}";
+        return $"h-16 sm:h-20 rounded-sm overflow-hidden border-2 transition-all focus:outline-none {borderClass}";
     }
 }

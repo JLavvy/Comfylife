@@ -1,0 +1,140 @@
+@page "/admin"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+@inject NavigationManager Navigation
+
+@using System.Globalization
+
+<div class="space-y-8">
+
+ 
+    <div>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Overview</p>
+        <h1 class="font-heading text-4xl text-primary">Dashboard</h1>
+        <p class="text-sm text-muted-foreground mt-2">Live view of your business — bookings, revenue, listings and guests.</p>
+    </div>
+
+   
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-3 gap-4">
+        @foreach (var k in _kpis)
+        {
+            <div class="bg-card border border-border p-5 rounded-sm">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@k.Label</p>
+                        <p class="font-heading text-3xl text-primary mt-1">@k.Value</p>
+                        <p class="text-xs text-muted-foreground mt-1">@k.Hint</p>
+                    </div>
+                    <i class="@k.Icon text-accent text-lg"></i>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-6">
+
+        <div class="lg:col-span-2 bg-card border border-border p-6 rounded-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Last 30 days</p>
+                    <h2 class="font-heading text-xl text-primary flex items-center gap-2">
+                        <i class="fas fa-arrow-trend-up text-accent"></i> Bookings &amp; Revenue
+                    </h2>
+                </div>
+            </div>
+           
+            <div class="h-64">
+                <canvas id="areaChart"></canvas>
+            </div>
+        </div>
+
+     
+        <div class="bg-card border border-border p-6 rounded-sm">
+            <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Distribution</p>
+            <h2 class="font-heading text-xl text-primary mb-2">Bookings by status</h2>
+            <div class="h-64 flex items-center justify-center">
+               
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="bg-card border border-border rounded-sm">
+        <div class="flex items-center justify-between p-5 border-b border-border">
+            <h2 class="font-heading text-xl text-primary flex items-center gap-2">
+                <i class="fas fa-clock text-accent"></i> Recent bookings
+            </h2>
+            <a href="/admin/bookings" class="text-xs uppercase tracking-widest text-accent font-bold hover:underline">View all →</a>
+        </div>
+
+        @if (_recent.Count == 0)
+        {
+            <div class="p-6 text-sm text-muted-foreground">No bookings yet.</div>
+        }
+        else
+        {
+            <div class="divide-y divide-border">
+                @foreach (var r in _recent)
+                {
+                    <div class="p-4 flex items-center justify-between gap-4 flex-wrap">
+                        <div>
+                            <p class="font-medium text-foreground">@r.GuestName</p>
+                            <p class="text-xs text-muted-foreground">@(r.ListingId ?? "—") · @r.CheckIn → @r.CheckOut</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            @if (r.TotalAmount.HasValue)
+                            {
+                                <span class="text-sm text-foreground">KES @r.TotalAmount.Value.ToString("N0")</span>
+                            }
+                            <span class="text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-sm"
+                                  style="background: @(StatusBgColor(r.Status)); color: @(StatusColor(r.Status));">
+                                @r.Status
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+    private static readonly Dictionary<string, string> _statusColors = new()
+    {
+        ["pending"]   = "hsl(var(--accent))",
+        ["approved"]  = "hsl(var(--primary))",
+        ["cancelled"] = "hsl(var(--destructive))",
+        ["completed"] = "hsl(var(--muted-foreground))",
+    };
+
+    private static string StatusColor(string s)   => _statusColors.GetValueOrDefault(s, "hsl(var(--muted))");
+    private static string StatusBgColor(string s) => StatusColor(s) + "20";
+
+    // ── Sample / placeholder data — replace with real data from your service ──
+    private readonly List<KpiCard> _kpis = new()
+    {
+        new("Total Revenue",        "KES 0",  "fas fa-dollar-sign",   "Approved + completed"),
+        new("Bookings",             "0",      "fas fa-calendar-check","0 pending"),
+        new("Active Listings",      "0/0",    "fas fa-house",         "Visible on site"),
+        new("Registered Users",     "0",      "fas fa-users",         "Profiles"),
+        new("New Inquiries",        "0/0",    "fas fa-inbox",         "Unhandled / total"),
+        new("Blocked Date Ranges",  "0",      "fas fa-calendar-xmark","Availability blocks"),
+    };
+
+    private readonly List<RecentBooking> _recent = new();
+
+    // ── Models ────────────────────────────────────────────────────────────────
+    private record KpiCard(string Label, string Value, string Icon, string Hint);
+
+    private record RecentBooking(
+        string   GuestName,
+        string?  ListingId,
+        string   CheckIn,
+        string   CheckOut,
+        string   Status,
+        decimal? TotalAmount
+    );
+}
