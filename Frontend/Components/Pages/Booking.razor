@@ -2,7 +2,8 @@
 @rendermode InteractiveServer
 @using Comfylife.Frontend.Models
 @using Comfylife.Frontend.Data
-
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager Nav
 
 <div>
 
@@ -15,9 +16,6 @@
     <section class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
 
-            @* KEY FIX: items-start keeps the sidebar from stretching to
-               the form height. Without it, sticky positioning has nothing
-               to stick inside and the aside just falls below the form. *@
             <div class="grid lg:grid-cols-3 gap-12 items-start">
 
                 @* ── Form column (2/3) ── *@
@@ -147,12 +145,6 @@
                 </div>
 
                 @* ── Sidebar (1/3) ── *@
-                @* KEY FIX: sticky top-24 only works when the grid uses
-                   items-start (the column height = content height, not
-                   the sibling's height). With items-stretch (the default)
-                   the column is as tall as the form, the sticky element
-                   has no room to scroll within, so it just sits at the top
-                   and looks like it disappeared. *@
                 <aside class="lg:col-span-1">
                     <div class="bg-card border border-border p-8 sticky top-24">
 
@@ -295,16 +287,6 @@
 </div>
 
 @code {
-    // ── Query string parameters ───────────────────────────────────────────
-    [SupplyParameterFromQuery(Name = "apartment")]
-    public string? ApartmentQuery { get; set; }
-
-    [SupplyParameterFromQuery(Name = "checkIn")]
-    public string? CheckInQuery { get; set; }
-
-    [SupplyParameterFromQuery(Name = "checkOut")]
-    public string? CheckOutQuery { get; set; }
-
     // ── State ─────────────────────────────────────────────────────────────
     private BookingForm FormData { get; set; } = new();
     private Dictionary<string, string> Errors { get; set; } = new();
@@ -322,16 +304,25 @@
     private BookingPriceSummary? CurrentPriceSummary => GetPriceSummary();
 
     // ── Lifecycle ─────────────────────────────────────────────────────────
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        if (!string.IsNullOrWhiteSpace(ApartmentQuery))
-            FormData.Apartment = ApartmentQuery;
+        var uri = new Uri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
 
-        if (DateTime.TryParse(CheckInQuery, out var checkIn))
+        if (query.TryGetValue("apartment", out var apt) && apt.Count > 0)
+            FormData.Apartment = apt[0]!;
+
+        if (query.TryGetValue("checkIn", out var ci) && ci.Count > 0
+            && DateTime.TryParse(ci[0], out var checkIn))
             FormData.CheckIn = checkIn;
 
-        if (DateTime.TryParse(CheckOutQuery, out var checkOut))
+        if (query.TryGetValue("checkOut", out var co) && co.Count > 0
+            && DateTime.TryParse(co[0], out var checkOut))
             FormData.CheckOut = checkOut;
+
+        if (query.TryGetValue("adults", out var a) && a.Count > 0
+            && int.TryParse(a[0], out var adults) && adults > 0)
+            FormData.Guests = adults.ToString();
     }
 
     // ── Submit ────────────────────────────────────────────────────────────

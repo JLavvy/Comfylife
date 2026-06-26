@@ -61,7 +61,7 @@
             @foreach (var item in AmenityData.Amenities.Select((amenity, index) => new { amenity, index }))
             {
                 <div @key="item.amenity.Title"
-                     class="border border-border rounded-lg p-6 lg:p-8 min-h-[420px] flex items-start hover:bg-primary/10 transition-colors cursor-pointer">
+                     class="border border-border rounded-lg p-6 lg:p-8 flex items-start hover:bg-primary/10 transition-colors cursor-pointer">
 
                     <div class="flex items-start gap-5">
                         <i class="@($"{item.amenity.Icon} text-accent text-3xl shrink-0 mt-1")"></i>

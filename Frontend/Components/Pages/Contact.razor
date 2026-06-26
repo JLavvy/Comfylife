@@ -6,7 +6,7 @@
               Highlight="Touch"
               Description="Have a question, special request, or planning a longer stay? Our concierge team is one message away." />
 
-    <section class="py-20 bg-white relative overflow-hidden">
+    <section class="py-20 bg-white relative overflow-hidden border-y border-border">
         <!-- Subtle background pattern -->
         <div class="absolute inset-0 bg-[radial-gradient(#e5d9c0_0.8px,transparent_0.8px)] [background-size:40px_40px] opacity-30"></div>
         
@@ -172,7 +172,7 @@
 
                                 <button type="submit"
                                         disabled="@IsSubmitting"
-                                        class="w-full h-16 mt-6 bg-primary hover:bg-primary/90 active:scale-[0.985] text-primary-foreground text-sm uppercase tracking-[0.125em] font-bold rounded-2xl transition-all duration-300 disabled:opacity-70">
+                                        class="w-full h-16 mt-6 bg-accent hover:bg-accent/90 active:scale-[0.985] text-primary-foreground text-sm uppercase tracking-[0.125em] font-bold rounded-2xl transition-all px-6 py-4 duration-300 disabled:opacity-70">
                                     @(IsSubmitting ? "Sending your message..." : "Send Message")
                                 </button>
                             </div>
