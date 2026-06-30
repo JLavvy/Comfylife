@@ -1,0 +1,337 @@
+@page "/admin/analytics"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+@using Comfylife.Frontend.Data
+
+<div class="space-y-6">
+    <div class="flex items-end justify-between flex-wrap gap-3">
+        <div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Insights</p>
+            <h1 class="font-heading text-4xl text-primary">Analytics</h1>
+            <p class="text-sm text-muted-foreground mt-2">Revenue, occupancy, and conversion at a glance.</p>
+        </div>
+
+        <div class="flex gap-1 p-1 bg-card border border-border rounded-sm">
+            @foreach (var r in RANGES)
+            {
+                <button class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 @(range == r.Key ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground")"
+                        @onclick="() => ChangeRange(r.Key)">
+                    @r.Label
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @foreach (var k in Kpis)
+        {
+            <div class="bg-card border border-border p-5 rounded-sm">
+                <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@k.Label</p>
+                <p class="font-heading text-2xl text-primary mt-1">@k.Value</p>
+            </div>
+        }
+    </div>
+
+    @if (loading)
+    {
+        <p class="text-sm text-muted-foreground">Loading…</p>
+    }
+    else
+    {
+        <div class="bg-card border border-border p-6 rounded-sm">
+            <h2 class="font-heading text-xl text-primary mb-4">Revenue trend</h2>
+
+            <div class="h-72 flex items-end gap-2 border-b border-border pb-4">
+                @foreach (var item in trend)
+                {
+                    var height = MaxRevenue == 0 ? 4 : Math.Max(4, (int)((item.Revenue / (decimal)MaxRevenue) * 220));
+
+                    <div class="flex-1 flex flex-col items-center justify-end gap-2 h-full">
+                        <div class="w-full bg-primary/80 rounded-t-sm" style="height:@($"{height}px")"></div>
+                        <p class="text-[10px] text-muted-foreground">@item.Date</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            <div class="bg-card border border-border p-6 rounded-sm">
+                <h2 class="font-heading text-xl text-primary mb-4">Bookings per day</h2>
+
+                <div class="h-64 flex items-end gap-2 border-b border-border pb-4">
+                    @foreach (var item in trend)
+                    {
+                        var height = MaxBookings == 0 ? 4 : Math.Max(4, (int)((item.Bookings / (decimal)MaxBookings) * 190));
+
+                        <div class="flex-1 flex flex-col items-center justify-end gap-2 h-full">
+                            <div class="w-full bg-accent rounded-t-sm" style="height:@($"{height}px")"></div>
+                            <p class="text-[10px] text-muted-foreground">@item.Date</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="bg-card border border-border p-6 rounded-sm">
+                <h2 class="font-heading text-xl text-primary mb-4">Revenue by listing</h2>
+
+                <div class="h-64">
+                    @if (listingData.Count == 0)
+                    {
+                        <div class="h-full flex items-center justify-center text-sm text-muted-foreground">No data</div>
+                    }
+                    else
+                    {
+                        <div class="space-y-4">
+                            @foreach (var item in listingData)
+                            {
+                                var width = MaxListingRevenue == 0 ? 4 : Math.Max(4, (int)((item.Revenue / (decimal)MaxListingRevenue) * 100));
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-muted-foreground">@item.Name</span>
+                                        <span class="text-foreground">KES @item.Revenue.ToString("N0")</span>
+                                    </div>
+
+                                    <div class="h-3 bg-muted">
+                                        <div class="h-3 bg-primary" style="width:@($"{width}%")"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-card border border-border rounded-sm overflow-x-auto">
+            <div class="p-5 border-b border-border">
+                <h2 class="font-heading text-xl text-primary">Listing performance</h2>
+                <p class="text-xs text-muted-foreground">Bookings & revenue per listing in the selected period.</p>
+            </div>
+
+            <table class="w-full text-sm">
+                <thead class="bg-muted/40">
+                    <tr>
+                        @foreach (var h in ListingHeadings)
+                        {
+                            <th class="text-left p-3 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@h</th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-border">
+                    @if (listingData.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="4" class="p-6 text-sm text-muted-foreground">No bookings in this period.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var l in listingData)
+                        {
+                            <tr>
+                                <td class="p-3 font-medium">@l.Name</td>
+                                <td class="p-3">@l.Bookings</td>
+                                <td class="p-3">KES @l.Revenue.ToString("N0")</td>
+                                <td class="p-3">KES @(l.Bookings > 0 ? Math.Round(l.Revenue / l.Bookings).ToString("N0") : "0")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <p class="text-xs text-muted-foreground">
+            Total approved nights in period:
+            <span class="text-foreground font-medium">@totalNights</span>
+        </p>
+    }
+</div>
+
+@code {
+    @* NOTE: React Recharts has no direct Blazor equivalent without adding a chart library, so this uses plain Tailwind/CSS bar visuals. *@
+
+    private readonly List<RangeOption> RANGES = new()
+    {
+        new() { Key = "7", Label = "7 days" },
+        new() { Key = "30", Label = "30 days" },
+        new() { Key = "90", Label = "90 days" },
+        new() { Key = "365", Label = "1 year" }
+    };
+
+    private readonly string[] ListingHeadings = { "Listing", "Bookings", "Revenue", "Avg. value" };
+
+    private string range = "30";
+    private bool loading = true;
+
+    private List<BookingRow> bookings = new();
+    private List<TrendRow> trend = new();
+    private List<ListingPerformance> listingData = new();
+    private List<KpiCard> Kpis = new();
+
+    private decimal totalRevenue;
+    private int approvedCount;
+    private int conversionRate;
+    private decimal avgValue;
+    private int totalNights;
+
+    private decimal MaxRevenue => trend.Count == 0 ? 0 : trend.Max(x => x.Revenue);
+    private int MaxBookings => trend.Count == 0 ? 0 : trend.Max(x => x.Bookings);
+    private decimal MaxListingRevenue => listingData.Count == 0 ? 0 : listingData.Max(x => x.Revenue);
+
+    protected override void OnInitialized()
+    {
+        Load();
+    }
+
+    private void ChangeRange(string key)
+    {
+        range = key;
+        Load();
+    }
+
+    private void Load()
+    {
+        loading = true;
+
+        bookings = SeedBookings();
+        BuildAnalytics();
+
+        loading = false;
+    }
+
+    private void BuildAnalytics()
+    {
+        var days = int.Parse(range);
+        var since = DateTime.Today.AddDays(-(days - 1));
+
+        var scopedBookings = bookings
+            .Where(x => x.CreatedAt.Date >= since.Date)
+            .ToList();
+
+        var dayMap = new Dictionary<string, TrendRow>();
+
+        for (var i = days - 1; i >= 0; i--)
+        {
+            var d = DateTime.Today.AddDays(-i);
+            var label = days > 90 ? d.ToString("MMM") : d.ToString("MMM d");
+
+            if (!dayMap.ContainsKey(label))
+            {
+                dayMap[label] = new TrendRow
+                {
+                    Date = label,
+                    Revenue = 0,
+                    Bookings = 0
+                };
+            }
+        }
+
+        foreach (var b in scopedBookings)
+        {
+            var label = days > 90 ? b.CreatedAt.ToString("MMM") : b.CreatedAt.ToString("MMM d");
+
+            if (dayMap.ContainsKey(label))
+            {
+                dayMap[label].Bookings += 1;
+
+                if (b.Status is "approved" or "completed")
+                {
+                    dayMap[label].Revenue += b.TotalAmount;
+                }
+            }
+        }
+
+        trend = dayMap.Values.ToList();
+
+        listingData = scopedBookings
+            .GroupBy(x => x.ListingId)
+            .Select(g => new ListingPerformance
+            {
+                Name = NameFor(g.Key),
+                Bookings = g.Count(),
+                Revenue = g.Where(x => x.Status is "approved" or "completed").Sum(x => x.TotalAmount)
+            })
+            .ToList();
+
+        totalRevenue = scopedBookings
+            .Where(x => x.Status is "approved" or "completed")
+            .Sum(x => x.TotalAmount);
+
+        approvedCount = scopedBookings.Count(x => x.Status is "approved" or "completed");
+
+        conversionRate = scopedBookings.Count > 0
+            ? (int)Math.Round((approvedCount / (decimal)scopedBookings.Count) * 100)
+            : 0;
+
+        avgValue = approvedCount > 0
+            ? Math.Round(totalRevenue / approvedCount)
+            : 0;
+
+        totalNights = scopedBookings
+            .Where(x => x.Status is "approved" or "completed")
+            .Sum(x => x.Nights);
+
+        Kpis = new List<KpiCard>
+        {
+            new() { Label = "Revenue", Value = $"KES {totalRevenue:N0}" },
+            new() { Label = "Approved bookings", Value = approvedCount.ToString() },
+            new() { Label = "Conversion rate", Value = $"{conversionRate}%" },
+            new() { Label = "Avg. booking value", Value = $"KES {avgValue:N0}" }
+        };
+    }
+
+    private static string NameFor(int id)
+    {
+        return ApartmentData.Apartments.FirstOrDefault(x => x.Id == id)?.Name ?? id.ToString();
+    }
+
+    private static List<BookingRow> SeedBookings()
+    {
+        return new List<BookingRow>
+        {
+            new() { Id = "1", ListingId = 1, CreatedAt = DateTime.Today.AddDays(-2), Status = "approved", TotalAmount = 26000, Nights = 4 },
+            new() { Id = "2", ListingId = 2, CreatedAt = DateTime.Today.AddDays(-5), Status = "completed", TotalAmount = 47500, Nights = 5 },
+            new() { Id = "3", ListingId = 3, CreatedAt = DateTime.Today.AddDays(-10), Status = "pending", TotalAmount = 40500, Nights = 3 },
+            new() { Id = "4", ListingId = 1, CreatedAt = DateTime.Today.AddDays(-15), Status = "approved", TotalAmount = 19500, Nights = 3 },
+            new() { Id = "5", ListingId = 2, CreatedAt = DateTime.Today.AddDays(-22), Status = "completed", TotalAmount = 28500, Nights = 3 }
+        };
+    }
+
+    public sealed class RangeOption
+    {
+        public string Key { get; set; } = "";
+        public string Label { get; set; } = "";
+    }
+
+    public sealed class BookingRow
+    {
+        public string Id { get; set; } = "";
+        public int ListingId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string Status { get; set; } = "";
+        public decimal TotalAmount { get; set; }
+        public int Nights { get; set; }
+    }
+
+    public sealed class TrendRow
+    {
+        public string Date { get; set; } = "";
+        public decimal Revenue { get; set; }
+        public int Bookings { get; set; }
+    }
+
+    public sealed class ListingPerformance
+    {
+        public string Name { get; set; } = "";
+        public int Bookings { get; set; }
+        public decimal Revenue { get; set; }
+    }
+
+    public sealed class KpiCard
+    {
+        public string Label { get; set; } = "";
+        public string Value { get; set; } = "";
+    }
+}

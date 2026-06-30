@@ -1,0 +1,313 @@
+@page "/admin/users"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+
+<div class="space-y-6">
+    <div>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Accounts</p>
+        <h1 class="font-heading text-4xl text-primary">Users</h1>
+        <p class="text-sm text-muted-foreground mt-2">Manage every registered account. Grant or revoke admin access and remove users.</p>
+    </div>
+
+    <div class="relative max-w-md">
+        <i class="fas fa-magnifying-glass h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+        <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 pl-9"
+               placeholder="Search by name or email…"
+               value="@q"
+               @oninput="e => q = e.Value?.ToString() ?? string.Empty" />
+    </div>
+
+    <div class="bg-card border border-border rounded-sm overflow-x-auto">
+        @if (loading)
+        {
+            <div class="p-8 text-sm text-muted-foreground">Loading…</div>
+        }
+        else if (Filtered.Count == 0)
+        {
+            <div class="p-8 text-sm text-muted-foreground">No users found.</div>
+        }
+        else
+        {
+            <table class="w-full text-sm">
+                <thead class="bg-muted/40">
+                    <tr>
+                        @foreach (var h in Headings)
+                        {
+                            <th class="text-left p-3 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@h</th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-border">
+                    @foreach (var p in Filtered)
+                    {
+                        var isAdmin = adminIds.Contains(p.Id);
+                        var isMe = meId == p.Id;
+
+                        <tr class="hover:bg-muted/30">
+                            <td class="p-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
+                                        @InitialFor(p)
+                                    </div>
+
+                                    <div>
+                                        <p class="font-medium">
+                                            @if (!string.IsNullOrWhiteSpace(p.FullName))
+                                            {
+                                                @p.FullName
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted-foreground italic">No name</span>
+                                            }
+
+                                            @if (isMe)
+                                            {
+                                                <span class="text-xs text-accent">(you)</span>
+                                            }
+                                        </p>
+
+                                        <p class="text-xs text-muted-foreground">@p.Email</p>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="p-3 text-muted-foreground">@(p.Phone ?? "—")</td>
+
+                            <td class="p-3">
+                                @if (isAdmin)
+                                {
+                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/15 text-primary border-primary/30">
+                                        <i class="fas fa-shield-check h-3 w-3 mr-1"></i>Admin
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                                        User
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="p-3 text-xs text-muted-foreground">@FormatDate(p.CreatedAt)</td>
+
+                            <td class="p-3">
+                                <div class="flex gap-1">
+                                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent h-9 px-3"
+                                            @onclick="() => OpenEdit(p)"
+                                            title="Edit">
+                                        <i class="fas fa-user-gear h-4 w-4"></i>
+                                    </button>
+
+                                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent h-9 px-3 disabled:pointer-events-none disabled:opacity-50"
+                                            @onclick="() => ToggleAdmin(p.Id)"
+                                            disabled="@isMe"
+                                            title="@(isAdmin ? "Revoke admin" : "Grant admin")">
+                                        @if (isAdmin)
+                                        {
+                                            <i class="fas fa-shield-halved h-4 w-4 text-destructive"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-shield-check h-4 w-4 text-primary"></i>
+                                        }
+                                    </button>
+
+                                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent h-9 px-3 disabled:pointer-events-none disabled:opacity-50"
+                                            @onclick="() => RemoveUser(p)"
+                                            disabled="@isMe"
+                                            title="Delete user">
+                                        <i class="fas fa-trash-can h-4 w-4 text-destructive"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (editing is not null)
+    {
+        <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+            <div class="bg-card border border-border p-6 rounded-sm w-full max-w-lg space-y-4">
+                <div>
+                    <h2 class="font-heading text-2xl text-primary">Edit user</h2>
+                    <p class="text-sm text-muted-foreground">@editing.Email</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs uppercase tracking-widest font-bold text-muted-foreground">Full name</label>
+                        <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm mt-2"
+                               value="@form.FullName"
+                               @oninput="e => form.FullName = e.Value?.ToString() ?? string.Empty" />
+                    </div>
+
+                    <div>
+                        <label class="text-xs uppercase tracking-widest font-bold text-muted-foreground">Phone</label>
+                        <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm mt-2"
+                               value="@form.Phone"
+                               @oninput="e => form.Phone = e.Value?.ToString() ?? string.Empty" />
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-4">
+                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-border h-10 px-4"
+                            @onclick="() => editing = null">
+                        Cancel
+                    </button>
+
+                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-accent text-accent-foreground h-10 px-4"
+                            @onclick="SaveEdit">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly string[] Headings = { "User", "Phone", "Role", "Joined", "Actions" };
+
+    private List<Profile> profiles = new();
+    private HashSet<string> adminIds = new();
+    private bool loading = true;
+    private string q = "";
+    private Profile? editing;
+    private UserForm form = new();
+
+    private string meId = "1";
+
+    private List<Profile> Filtered
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(q))
+                return profiles;
+
+            var s = q.ToLower();
+
+            return profiles
+                .Where(p =>
+                    (p.Email ?? "").ToLower().Contains(s) ||
+                    (p.FullName ?? "").ToLower().Contains(s))
+                .ToList();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Load();
+    }
+
+    private void Load()
+    {
+        loading = true;
+
+        profiles = new List<Profile>
+        {
+            new()
+            {
+                Id = "1",
+                Email = "admin@comfylife.co.ke",
+                FullName = "Admin User",
+                Phone = "+254 700 000 000",
+                CreatedAt = DateTime.Now.AddMonths(-2).ToString("O")
+            },
+            new()
+            {
+                Id = "2",
+                Email = "guest@example.com",
+                FullName = "Sample Guest",
+                Phone = "+254 711 111 111",
+                CreatedAt = DateTime.Now.AddDays(-12).ToString("O")
+            }
+        };
+
+        adminIds = new HashSet<string> { "1" };
+
+        loading = false;
+    }
+
+    private void ToggleAdmin(string uid)
+    {
+        if (adminIds.Contains(uid))
+        {
+            adminIds.Remove(uid);
+        }
+        else
+        {
+            adminIds.Add(uid);
+        }
+    }
+
+    private void OpenEdit(Profile p)
+    {
+        editing = p;
+
+        form = new UserForm
+        {
+            FullName = p.FullName ?? "",
+            Phone = p.Phone ?? ""
+        };
+    }
+
+    private void SaveEdit()
+    {
+        if (editing is null)
+            return;
+
+        editing.FullName = form.FullName;
+        editing.Phone = form.Phone;
+
+        editing = null;
+    }
+
+    private void RemoveUser(Profile p)
+    {
+        if (p.Id == meId)
+            return;
+
+        profiles.Remove(p);
+        adminIds.Remove(p.Id);
+        editing = null;
+    }
+
+    private static string FormatDate(string value)
+    {
+        return DateTime.TryParse(value, out var date)
+            ? date.ToString("MMM d, yyyy")
+            : value;
+    }
+
+    private static string InitialFor(Profile p)
+    {
+        var source = !string.IsNullOrWhiteSpace(p.FullName)
+            ? p.FullName
+            : p.Email;
+
+        return string.IsNullOrWhiteSpace(source)
+            ? "?"
+            : source[0].ToString().ToUpper();
+    }
+
+    public sealed class Profile
+    {
+        public string Id { get; set; } = "";
+        public string? Email { get; set; }
+        public string? FullName { get; set; }
+        public string? Phone { get; set; }
+        public string? AvatarUrl { get; set; }
+        public string CreatedAt { get; set; } = "";
+    }
+
+    public sealed class UserForm
+    {
+        public string FullName { get; set; } = "";
+        public string Phone { get; set; } = "";
+    }
+}

@@ -1,0 +1,155 @@
+@page "/admin/listings/{Id:int}"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+@inject NavigationManager Nav
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Models
+
+@if (listing is null)
+{
+    <div class="text-sm text-muted-foreground">Listing not found.</div>
+}
+else
+{
+    <div class="space-y-8 max-w-4xl">
+        <div>
+            <a href="/admin/listings"
+               class="inline-flex items-center gap-1 text-xs uppercase tracking-widest font-bold text-muted-foreground hover:text-primary mb-4">
+                <i class="fas fa-arrow-left"></i> Back to listings
+            </a>
+
+            <h1 class="font-heading text-4xl text-primary">@listing.Name</h1>
+            <p class="text-xs text-muted-foreground">Editing listing ID: @listing.Id</p>
+        </div>
+
+        <section class="bg-card border border-border p-6 space-y-4">
+            <h2 class="font-heading text-xl text-primary">Details</h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Name</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Name"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Tagline</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Tagline"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Location</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Location"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Area</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Area"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Bedrooms</label>
+                    <input type="number" class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Bedrooms" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Beds</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Beds"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Bathrooms</label>
+                    <input type="number" class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Bathrooms" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Size</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Size"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Floor</label>
+                    <input class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.Floor"
+                           @bind:event="oninput" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Max Guests</label>
+                    <input type="number" class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.MaxGuests" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Nightly Rate</label>
+                    <input type="number" class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.NightlyRate" />
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Monthly Rate</label>
+                    <input type="number" class="h-10 w-full rounded-md border border-border px-3 py-2 text-sm"
+                           @bind="listing.MonthlyRate" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Short Description</label>
+                <textarea rows="3"
+                          class="w-full rounded-md border border-border px-3 py-2 text-sm"
+                          @bind="listing.Description"
+                          @bind:event="oninput"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Long Description</label>
+                <textarea rows="5"
+                          class="w-full rounded-md border border-border px-3 py-2 text-sm"
+                          @bind="listing.LongDescription"
+                          @bind:event="oninput"></textarea>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button class="h-10 px-4 rounded-md bg-accent text-accent-foreground text-sm font-medium"
+                        @onclick="Save">
+                    Save changes
+                </button>
+
+                <button class="h-10 px-4 rounded-md border border-border text-sm"
+                        @onclick='() => Nav.NavigateTo("/admin/listings")'>
+                    Done
+                </button>
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ApartmentListing? listing;
+
+    protected override void OnParametersSet()
+    {
+        listing = ApartmentData.Apartments.FirstOrDefault(x => x.Id == Id);
+    }
+
+    private void Save()
+    {
+        Nav.NavigateTo("/admin/listings");
+    }
+}

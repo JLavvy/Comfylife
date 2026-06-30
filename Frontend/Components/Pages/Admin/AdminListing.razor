@@ -1,0 +1,124 @@
+@page "/admin/listings"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+@inject NavigationManager Nav
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Models
+
+<div class="space-y-8">
+    <div>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Inventory</p>
+        <h1 class="font-heading text-4xl text-primary">Listings</h1>
+    </div>
+
+    <div class="bg-card border border-border p-6">
+        <p class="text-xs uppercase tracking-widest font-bold text-muted-foreground mb-3">
+            Add a new listing
+        </p>
+
+        <div class="flex gap-3">
+            <input class="h-10 w-full rounded-md border border-border bg-white px-3 py-2 text-sm"
+                   placeholder="e.g. Savannah House"
+                   @bind="newName"
+                   @bind:event="oninput" />
+
+            <button class="h-10 px-4 rounded-md bg-accent text-accent-foreground text-sm font-medium disabled:opacity-50"
+                    @onclick="Create"
+                    disabled="@string.IsNullOrWhiteSpace(newName)">
+                <i class="fas fa-plus"></i> Create
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-card border border-border overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-muted/40">
+                <tr>
+                    <th class="text-left p-4">Name</th>
+                    <th class="text-left p-4">Beds</th>
+                    <th class="text-left p-4">Nightly</th>
+                    <th class="text-left p-4">Monthly</th>
+                    <th class="text-right p-4"></th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border">
+                @foreach (var listing in Listings)
+                {
+                    <tr>
+                        <td class="p-4 font-medium">
+                            @listing.Name
+                            <div class="text-xs text-muted-foreground">ID: @listing.Id</div>
+                        </td>
+                        <td class="p-4">@listing.Beds</td>
+                        <td class="p-4">KES @listing.NightlyRate.ToString("N0")</td>
+                        <td class="p-4">KES @listing.MonthlyRate.ToString("N0")</td>
+                        <td class="p-4 text-right">
+                            <a href="/admin/listings/@listing.Id"
+                               class="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent">
+                                <i class="fas fa-pen"></i>
+                            </a>
+
+                            <button class="inline-flex items-center justify-center h-9 w-9 rounded-md text-red-600 hover:bg-accent"
+                                    @onclick="() => Remove(listing)">
+                                <i class="fas fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<ApartmentListing> Listings => ApartmentData.Apartments;
+    private string newName = "";
+
+    private void Create()
+    {
+        var name = newName.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        var nextId = Listings.Any() ? Listings.Max(x => x.Id) + 1 : 1;
+
+        var listing = new ApartmentListing
+        {
+            Id = nextId,
+            Name = name,
+            Tagline = "NEW LISTING",
+            Image = "images/Dream/rooftop.jpeg",
+            Location = "Kilimani",
+            Area = "Kilimani",
+            Description = "New apartment listing.",
+            LongDescription = "New apartment listing details.",
+            Bedrooms = 1,
+            Beds = "1 Bed",
+            Bathrooms = 1,
+            Size = "Spacious",
+            Floor = "",
+            MaxGuests = 2,
+            NightlyRate = 0,
+            MonthlyRate = 0,
+            Amenities = new(),
+            Features = new(),
+            Images = new()
+            {
+                "images/Dream/rooftop.jpeg"
+            },
+            IsActive = true
+        };
+
+        ApartmentData.Apartments.Add(listing);
+        newName = "";
+
+        Nav.NavigateTo($"/admin/listings/{listing.Id}");
+    }
+
+    private void Remove(ApartmentListing listing)
+    {
+        ApartmentData.Apartments.Remove(listing);
+    }
+}

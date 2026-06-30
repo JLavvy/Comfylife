@@ -1,0 +1,163 @@
+@page "/auth"
+@rendermode InteractiveServer
+@layout MinimalLayout
+@inject NavigationManager Nav
+
+<div class="min-h-[80vh] flex items-center justify-center px-6 py-16">
+    <div class="w-full max-w-md bg-card border border-border p-10 shadow-elegant">
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Admin Area</p>
+
+        <h1 class="font-heading text-4xl text-primary mb-2">
+            @(mode == "signin" ? "Sign in" : "Create account")
+        </h1>
+
+        <p class="text-sm text-muted-foreground mb-8">
+            @(mode == "signin"
+                ? "Sign in to manage listings, photos and bookings."
+                : "Create an admin account for ComfyLife BnB.")
+        </p>
+
+        <form @onsubmit="Submit" @onsubmit:preventDefault="true" class="space-y-4">
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Email</label>
+                <input type="email"
+                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                       value="@email"
+                       @oninput="e => email = e.Value?.ToString() ?? string.Empty"
+                       autocomplete="email"
+                       required />
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Password</label>
+                <input type="password"
+                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                       value="@password"
+                       @oninput="e => password = e.Value?.ToString() ?? string.Empty"
+                       autocomplete="@(mode == "signin" ? "current-password" : "new-password")"
+                       required />
+            </div>
+
+            <button type="submit"
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-accent text-accent-foreground hover:bg-accent/90 h-11 px-8 w-full rounded-sm uppercase tracking-widest text-xs font-bold"
+                    disabled="@submitting">
+                @(submitting ? "Please wait..." : mode == "signin" ? "Sign in" : "Create account")
+            </button>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="mt-4 border border-destructive/30 bg-destructive/10 text-destructive text-sm p-3 rounded-sm">
+                @errorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="mt-4 border border-primary/30 bg-primary/10 text-primary text-sm p-3 rounded-sm">
+                @successMessage
+            </div>
+        }
+
+        <div class="mt-6 text-center text-sm text-muted-foreground">
+            @if (mode == "signin")
+            {
+                <span>No account yet? </span>
+                <button type="button"
+                        @onclick='() => SetMode("signup")'
+                        class="text-primary underline">
+                    Create one
+                </button>
+            }
+            else
+            {
+                <span>Already have an account? </span>
+                <button type="button"
+                        @onclick='() => SetMode("signin")'
+                        class="text-primary underline">
+                    Sign in
+                </button>
+            }
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/" class="text-xs uppercase tracking-widest text-muted-foreground hover:text-primary">
+                ← Back to site
+            </a>
+        </div>
+    </div>
+</div>
+
+@code {
+    @* NOTE: Backend authentication has intentionally been removed for now. This page only validates input and simulates navigation/state. *@
+
+    private string mode = "signin";
+    private string email = "";
+    private string password = "";
+    private bool submitting = false;
+
+    private string errorMessage = "";
+    private string successMessage = "";
+
+    private async Task Submit()
+    {
+        errorMessage = "";
+        successMessage = "";
+
+        var validationError = Validate(email, password);
+
+        if (!string.IsNullOrWhiteSpace(validationError))
+        {
+            errorMessage = validationError;
+            return;
+        }
+
+        submitting = true;
+        await Task.Delay(300);
+        submitting = false;
+
+        if (mode == "signup")
+        {
+            successMessage = "Account created. You can now sign in.";
+            mode = "signin";
+            password = "";
+        }
+        else
+        {
+            Nav.NavigateTo("/admin", replace: true);
+        }
+    }
+
+    private void SetMode(string value)
+    {
+        mode = value;
+        errorMessage = "";
+        successMessage = "";
+        password = "";
+    }
+
+    private static string Validate(string emailValue, string passwordValue)
+    {
+        emailValue = emailValue.Trim();
+
+        if (string.IsNullOrWhiteSpace(emailValue))
+            return "Email is required.";
+
+        if (!emailValue.Contains("@") || !emailValue.Contains("."))
+            return "Enter a valid email.";
+
+        if (emailValue.Length > 255)
+            return "Email must be 255 characters or less.";
+
+        if (string.IsNullOrWhiteSpace(passwordValue))
+            return "Password is required.";
+
+        if (passwordValue.Length < 6)
+            return "Password must be at least 6 characters.";
+
+        if (passwordValue.Length > 72)
+            return "Password must be 72 characters or less.";
+
+        return "";
+    }
+}

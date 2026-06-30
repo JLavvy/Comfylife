@@ -1,0 +1,205 @@
+@page "/admin/availability"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Models
+
+<div class="space-y-8">
+    <div>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Calendar</p>
+        <h1 class="font-heading text-4xl text-primary">Availability</h1>
+        <p class="text-sm text-muted-foreground mt-2">Block off dates so they show as unavailable on the public availability calendar.</p>
+    </div>
+
+    <div class="bg-card border border-border p-6 space-y-4">
+        <h2 class="font-heading text-lg text-primary">Block dates</h2>
+
+        <div class="grid md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Listing</label>
+                <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        @bind="listingId">
+                    @foreach (var listing in listings)
+                    {
+                        <option value="@listing.Id">@listing.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Start</label>
+                <input type="date"
+                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                       @bind="start" />
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">End</label>
+                <input type="date"
+                       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                       @bind="end" />
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-muted-foreground mb-2">Reason (optional)</label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                       value="@reason"
+                       @oninput="e => reason = e.Value?.ToString() ?? string.Empty"
+                       placeholder="Booked / maintenance" />
+            </div>
+        </div>
+
+        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[var(--color-gold,hsl(var(--accent)))] text-[var(--color-gold-foreground,hsl(var(--accent-foreground)))] hover:bg-[var(--color-gold,hsl(var(--accent)))]/90 h-10 px-4 py-2"
+                @onclick="Add">
+            <i class="fas fa-plus"></i> Block these dates
+        </button>
+    </div>
+
+    <div class="bg-card border border-border overflow-hidden">
+        @if (blocks.Count == 0)
+        {
+            <div class="p-6 text-sm text-muted-foreground">No blocked dates.</div>
+        }
+        else
+        {
+            <table class="w-full text-sm">
+                <thead class="bg-muted/40">
+                    <tr>
+                        <th class="text-left p-4 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Listing</th>
+                        <th class="text-left p-4 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Start</th>
+                        <th class="text-left p-4 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">End</th>
+                        <th class="text-left p-4 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Reason</th>
+                        <th class="text-right p-4"></th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-border">
+                    @foreach (var block in blocks)
+                    {
+                        <tr>
+                            <td class="p-4">@NameFor(block.ListingId)</td>
+                            <td class="p-4">@block.StartDate.ToString("MMM d, yyyy")</td>
+                            <td class="p-4">@block.EndDate.ToString("MMM d, yyyy")</td>
+                            <td class="p-4 text-muted-foreground">@(string.IsNullOrWhiteSpace(block.Reason) ? "—" : block.Reason)</td>
+                            <td class="p-4 text-right">
+                                <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-accent hover:text-accent-foreground h-9 px-3 text-destructive hover:text-destructive"
+                                        @onclick="() => Remove(block.Id)">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(toastTitle))
+    {
+        <div class="fixed bottom-4 right-4 z-50 bg-card border border-border p-4 shadow-lg text-sm max-w-xs">
+            <p class="font-semibold @(toastVariant == "destructive" ? "text-destructive" : "text-foreground")">@toastTitle</p>
+            @if (!string.IsNullOrWhiteSpace(toastDescription))
+            {
+                <p class="text-muted-foreground text-xs mt-1">@toastDescription</p>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<ApartmentListing> listings = new();
+    private List<Block> blocks = new();
+
+    private int listingId;
+    private DateTime? start;
+    private DateTime? end;
+    private string reason = string.Empty;
+
+    private string toastTitle = string.Empty;
+    private string toastDescription = string.Empty;
+    private string toastVariant = string.Empty;
+    private System.Threading.Timer? toastTimer;
+
+    protected override void OnInitialized()
+    {
+        listings = ApartmentData.Apartments;
+
+        if (listings.Count > 0)
+        {
+            listingId = listings[0].Id;
+        }
+    }
+
+    private void Add()
+    {
+        if (listingId == 0 || start is null || end is null)
+        {
+            ShowToast("Fill all required fields", string.Empty, "destructive");
+            return;
+        }
+
+        if (end < start)
+        {
+            ShowToast("Invalid date range", "End date cannot be before start date.", "destructive");
+            return;
+        }
+
+        blocks.Add(new Block
+        {
+            Id = Guid.NewGuid().ToString(),
+            ListingId = listingId,
+            StartDate = start.Value,
+            EndDate = end.Value,
+            Reason = reason
+        });
+
+        start = null;
+        end = null;
+        reason = string.Empty;
+
+        ShowToast("Dates blocked", string.Empty);
+    }
+
+    private void Remove(string id)
+    {
+        var block = blocks.FirstOrDefault(x => x.Id == id);
+
+        if (block is not null)
+        {
+            blocks.Remove(block);
+        }
+    }
+
+    private string NameFor(int id)
+    {
+        return listings.FirstOrDefault(x => x.Id == id)?.Name ?? id.ToString();
+    }
+
+    private void ShowToast(string title, string description, string variant = "")
+    {
+        toastTitle = title;
+        toastDescription = description;
+        toastVariant = variant;
+
+        StateHasChanged();
+
+        toastTimer?.Dispose();
+        toastTimer = new System.Threading.Timer(_ =>
+        {
+            toastTitle = string.Empty;
+            toastDescription = string.Empty;
+            toastVariant = string.Empty;
+
+            InvokeAsync(StateHasChanged);
+        }, null, 3500, Timeout.Infinite);
+    }
+
+    public sealed class Block
+    {
+        public string Id { get; set; } = string.Empty;
+        public int ListingId { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Reason { get; set; } = string.Empty;
+    }
+}

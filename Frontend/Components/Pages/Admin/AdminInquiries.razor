@@ -1,0 +1,157 @@
+@page "/admin/inquiries"
+@rendermode InteractiveServer
+@layout Pages.Admin.AdminLayout
+
+<div class="space-y-8">
+    <div>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Guests</p>
+        <h1 class="font-heading text-4xl text-primary">Inquiries</h1>
+    </div>
+
+    @if (loading)
+    {
+        <p class="text-sm text-muted-foreground">Loading…</p>
+    }
+    else if (rows.Count == 0)
+    {
+        <p class="text-sm text-muted-foreground">No inquiries yet.</p>
+    }
+    else
+    {
+        <div class="space-y-4">
+            @foreach (var r in rows)
+            {
+                <div class="bg-card border border-border p-6">
+                    <div class="flex justify-between items-start gap-4 flex-wrap">
+                        <div>
+                            <h3 class="font-heading text-xl text-primary">@r.Name</h3>
+                            <div class="flex flex-wrap gap-4 text-sm text-muted-foreground mt-1">
+                                <a href="@($"mailto:{r.Email}")" class="flex items-center gap-1 hover:text-primary">
+                                    <i class="fas fa-envelope h-3 w-3"></i>@r.Email
+                                </a>
+
+                                @if (!string.IsNullOrWhiteSpace(r.Phone))
+                                {
+                                    <a href="@($"tel:{r.Phone}")" class="flex items-center gap-1 hover:text-primary">
+                                        <i class="fas fa-phone h-3 w-3"></i>@r.Phone
+                                    </a>
+                                }
+
+                                <span>@FormatDateTime(r.CreatedAt)</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <select value="@r.Status"
+                                    @onchange="e => UpdateStatus(r.Id, e.Value?.ToString() ?? string.Empty)"
+                                    class="text-xs uppercase tracking-widest font-bold border border-border bg-background px-3 py-2 rounded-sm">
+                                @foreach (var s in STATUSES)
+                                {
+                                    <option value="@s">@s.Replace("_", " ")</option>
+                                }
+                            </select>
+
+                            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent h-9 px-3 text-destructive hover:text-destructive"
+                                    @onclick="() => Remove(r.Id)">
+                                <i class="fas fa-trash-can h-4 w-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid sm:grid-cols-4 gap-4 mt-4 text-xs">
+                        <Info Label="Listing" Value="@(r.ListingId ?? "—")" />
+                        <Info Label="Check-in" Value="@(r.CheckIn ?? "—")" />
+                        <Info Label="Check-out" Value="@(r.CheckOut ?? "—")" />
+                        <Info Label="Guests" Value="@(r.Guests?.ToString() ?? "—")" />
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(r.Message))
+                    {
+                        <p class="text-sm text-foreground/80 leading-relaxed mt-4 whitespace-pre-wrap border-t border-border pt-4">
+                            @r.Message
+                        </p>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private readonly string[] STATUSES = { "new", "in_progress", "confirmed", "archived" };
+
+    private List<Inquiry> rows = new();
+    private bool loading = true;
+
+    protected override void OnInitialized()
+    {
+        Load();
+    }
+
+    private void Load()
+    {
+        loading = true;
+
+        rows = new List<Inquiry>
+        {
+            new()
+            {
+                Id = "1",
+                ListingId = "Prince House",
+                Name = "Sample Guest",
+                Email = "guest@example.com",
+                Phone = "+254 700 000 000",
+                CheckIn = DateTime.Today.AddDays(3).ToString("yyyy-MM-dd"),
+                CheckOut = DateTime.Today.AddDays(6).ToString("yyyy-MM-dd"),
+                Guests = 2,
+                Message = "I would like to know if the apartment is available for these dates.",
+                Status = "new",
+                CreatedAt = DateTime.Now.ToString("O")
+            }
+        };
+
+        loading = false;
+    }
+
+    private void UpdateStatus(string id, string status)
+    {
+        var inquiry = rows.FirstOrDefault(x => x.Id == id);
+
+        if (inquiry is not null)
+        {
+            inquiry.Status = status;
+        }
+    }
+
+    private void Remove(string id)
+    {
+        var inquiry = rows.FirstOrDefault(x => x.Id == id);
+
+        if (inquiry is not null)
+        {
+            rows.Remove(inquiry);
+        }
+    }
+
+    private static string FormatDateTime(string value)
+    {
+        return DateTime.TryParse(value, out var date)
+            ? date.ToString("MMM d, yyyy HH:mm")
+            : value;
+    }
+
+    public sealed class Inquiry
+    {
+        public string Id { get; set; } = "";
+        public string? ListingId { get; set; }
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string? CheckIn { get; set; }
+        public string? CheckOut { get; set; }
+        public int? Guests { get; set; }
+        public string Message { get; set; } = "";
+        public string Status { get; set; } = "new";
+        public string CreatedAt { get; set; } = "";
+    }
+}

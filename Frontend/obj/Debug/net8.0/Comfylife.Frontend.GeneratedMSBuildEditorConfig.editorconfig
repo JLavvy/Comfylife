@@ -38,6 +38,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBYm91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminAnalytics.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkFuYWx5dGljcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminAvailability.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkF2YWlsYWJpbGl0eS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminBookingsPage.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkJvb2tpbmdzUGFnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -46,12 +54,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkRhc2hib2FyZFBhZ2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminInquiries.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbklucXVpcmllcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminListing.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkxpc3RpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminListingEdit.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pbkxpc3RpbmdFZGl0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Admin/AdminUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblxBZG1pblVzZXJzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Amenities.razor]
@@ -76,6 +96,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lavog/OneDrive/Documents/GitHub/Comfylife/Frontend/Components/Pages/SearchResults.razor]

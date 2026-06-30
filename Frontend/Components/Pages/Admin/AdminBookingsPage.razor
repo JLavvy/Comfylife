@@ -1,12 +1,712 @@
 @page "/admin/bookings"
-
-@layout Pages.Admin.AdminLayout
+@rendermode InteractiveServer
 @inject NavigationManager Navigation
-<div class="space-y-8">
+@layout Pages.Admin.AdminLayout
+@using System.Globalization
+@using Comfylife.Frontend.Data
+@using Comfylife.Frontend.Models
 
-    <div>
-        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Bookings</p>
-        <h1 class="font-heading text-4xl text-primary">Manage Bookings</h1>
-        <p class="text-sm text-muted-foreground mt-2">View and manage all bookings made through the platform. You can filter, search, and update booking statuses as needed.</p>
-    </div>  
+<div class="space-y-6">
+    <div class="flex items-end justify-between flex-wrap gap-3">
+        <div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-2">Reservations</p>
+            <h1 class="font-heading text-4xl text-primary">Bookings</h1>
+            <p class="text-sm text-muted-foreground mt-2">Approve, cancel and manage every reservation request.</p>
+        </div>
+
+        <button class="inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-colors" @onclick="OpenCreate">
+            <i class="fas fa-plus h-4 w-4 mr-2"></i>
+            New Booking
+        </button>
     </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        @foreach (var s in StatusCards)
+        {
+            <button @key="s.Key"
+                    @onclick="() => StatusFilter = s.Key"
+                    class="@($"text-left p-4 border rounded-sm transition-colors {(StatusFilter == s.Key ? "border-accent bg-accent/5" : "border-border bg-card hover:border-accent/50")}")">
+                <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@s.Label</p>
+                <p class="font-heading text-2xl text-primary mt-1">@GetCount(s.Key)</p>
+            </button>
+        }
+    </div>
+
+    <div class="flex gap-3 items-center">
+        <div class="relative flex-1 max-w-md">
+            <i class="fas fa-magnifying-glass h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+            <input class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-9"
+                   placeholder="Search guest, email, listing…"
+                   value="@Q"
+                   @oninput="e => Q = e.Value?.ToString() ?? string.Empty" />
+        </div>
+
+        <select class="flex h-10 w-40 items-center justify-between rounded-sm border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                value="@StatusFilter"
+                @onchange='e => StatusFilter = e.Value?.ToString() ?? "all"'>
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="completed">Completed</option>
+        </select>
+    </div>
+
+    <div class="bg-card border border-border rounded-sm overflow-x-auto">
+        @if (Loading)
+        {
+            <div class="p-8 text-sm text-muted-foreground">Loading…</div>
+        }
+        else if (!Filtered.Any())
+        {
+            <div class="p-8 text-sm text-muted-foreground">No bookings match your filters.</div>
+        }
+        else
+        {
+            <table class="w-full text-sm">
+                <thead class="bg-muted/40">
+                    <tr>
+                        @foreach (var h in TableHeaders)
+                        {
+                            <th @key="h" class="text-left p-3 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">@h</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                    @foreach (var r in Filtered)
+                    {
+                        <tr @key="r.Id" class="hover:bg-muted/30 cursor-pointer" @onclick="() => OpenDetail(r)">
+                            <td class="p-3">
+                                <p class="font-medium">@r.GuestName</p>
+                                <p class="text-xs text-muted-foreground">@r.Email</p>
+                            </td>
+                            <td class="p-3">@NameFor(r.ListingId)</td>
+                            <td class="p-3 text-xs">
+                                @FormatDate(r.CheckIn, "MMM d") → @FormatDate(r.CheckOut, "MMM d, yyyy")
+                                <div class="text-muted-foreground">@r.Nights night@(r.Nights != 1 ? "s" : "")</div>
+                            </td>
+                            <td class="p-3">@r.Guests</td>
+                            <td class="p-3">@(r.TotalAmount.HasValue ? $"KES {r.TotalAmount.Value.ToString("N0", CultureInfo.InvariantCulture)}" : "—")</td>
+                            <td class="p-3">
+                                <span class="@($"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold {StatusBadge[r.Status]}")">@r.Status</span>
+                            </td>
+                            <td class="p-3" @onclick:stopPropagation="true">
+                                <div class="flex gap-1">
+                                    @if (r.Status != "approved")
+                                    {
+                                        <button class="inline-flex items-center justify-center rounded-sm text-sm font-medium hover:bg-accent hover:text-accent-foreground h-8 w-8" @onclick='() => SetStatus(r.Id, "approved")' title="Approve">
+                                            <i class="fas fa-circle-check h-4 w-4 text-primary"></i>
+                                        </button>
+                                    }
+
+                                    @if (r.Status != "cancelled")
+                                    {
+                                        <button class="inline-flex items-center justify-center rounded-sm text-sm font-medium hover:bg-accent hover:text-accent-foreground h-8 w-8" @onclick='() => SetStatus(r.Id, "cancelled")' title="Cancel">
+                                            <i class="fas fa-circle-xmark h-4 w-4 text-destructive"></i>
+                                        </button>
+                                    }
+
+                                    <button class="inline-flex items-center justify-center rounded-sm text-sm font-medium hover:bg-accent hover:text-accent-foreground h-8 w-8" @onclick="() => OpenEdit(r)" title="Edit">
+                                        <i class="fas fa-pen-to-square h-4 w-4 text-muted-foreground"></i>
+                                    </button>
+
+                                    <button class="inline-flex items-center justify-center rounded-sm text-sm font-medium hover:bg-accent hover:text-accent-foreground h-8 w-8" @onclick="() => Remove(r.Id)" title="Delete">
+                                        <i class="fas fa-trash h-4 w-4 text-muted-foreground"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (Detail is not null)
+    {
+        <div class="fixed inset-0 z-50 bg-black/80" @onclick="CloseDetail"></div>
+        <div class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg">
+            <div>
+                <h2 class="font-heading text-2xl text-primary">@Detail.GuestName</h2>
+                <p class="text-sm text-muted-foreground">
+                    Booking request from @FormatDate(Detail.CreatedAt, "MMM d, yyyy HH:mm")
+                </p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                <Info Label="Listing" Value="@NameFor(Detail.ListingId)" />
+                <Info Label="Status">
+                    <span class="@($"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold {StatusBadge[Detail.Status]}")">@Detail.Status</span>
+                </Info>
+                <Info Label="Email">
+                    <a href="@($"mailto:{Detail.Email}")" class="flex items-center gap-1 text-primary">
+                        <i class="fas fa-envelope h-3 w-3"></i>
+                        @Detail.Email
+                    </a>
+                </Info>
+                <Info Label="Phone">
+                    @if (!string.IsNullOrWhiteSpace(Detail.Phone))
+                    {
+                        <a href="@($"tel:{Detail.Phone}")" class="flex items-center gap-1 text-primary">
+                            <i class="fas fa-phone h-3 w-3"></i>
+                            @Detail.Phone
+                        </a>
+                    }
+                    else
+                    {
+                        @("—")
+                    }
+                </Info>
+                <Info Label="Check-in" Value="@FormatDate(Detail.CheckIn, "MMM d, yyyy")" />
+                <Info Label="Check-out" Value="@FormatDate(Detail.CheckOut, "MMM d, yyyy")" />
+                <Info Label="Nights" Value="@Detail.Nights.ToString()" />
+                <Info Label="Guests" Value="@Detail.Guests.ToString()" />
+                <Info Label="Total" Value="@(Detail.TotalAmount.HasValue ? $"KES {Detail.TotalAmount.Value.ToString("N0", CultureInfo.InvariantCulture)}" : "—")" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Detail.Notes))
+            {
+                <div class="border-t border-border pt-4">
+                    <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-2">Notes</p>
+                    <p class="text-sm whitespace-pre-wrap">@Detail.Notes</p>
+                </div>
+            }
+
+            <div class="border-t border-border pt-4">
+                <button class="inline-flex items-center justify-center rounded-sm border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground" @onclick="() => CheckAvailability(Detail)">
+                    <i class="fas fa-calendar h-4 w-4 mr-2"></i>
+                    Check availability for these dates
+                </button>
+
+                @if (Availability is not null)
+                {
+                    <p class="@($"text-sm mt-2 {(Availability.Value ? "text-primary" : "text-destructive")}")">
+                        @(Availability.Value ? "✓ Dates are available (no conflicts)" : "✗ Conflict — other booking or blocked dates overlap")
+                    </p>
+                }
+            </div>
+
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 flex-wrap">
+                <button class="inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground text-destructive" @onclick="() => Remove(Detail.Id)">
+                    <i class="fas fa-trash h-4 w-4 mr-2"></i>
+                    Delete
+                </button>
+
+                <button class="inline-flex items-center justify-center rounded-sm border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" @onclick="() => OpenEdit(Detail)">
+                    <i class="fas fa-pen-to-square h-4 w-4 mr-2"></i>
+                    Edit
+                </button>
+
+                @if (Detail.Status != "cancelled")
+                {
+                    <button class="inline-flex items-center justify-center rounded-sm border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" @onclick='() => SetStatus(Detail.Id, "cancelled")'>
+                        <i class="fas fa-circle-xmark h-4 w-4 mr-2"></i>
+                        Cancel
+                    </button>
+                }
+
+                @if (Detail.Status != "completed")
+                {
+                    <button class="inline-flex items-center justify-center rounded-sm border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" @onclick='() => SetStatus(Detail.Id, "completed")'>
+                        Mark completed
+                    </button>
+                }
+
+                @if (Detail.Status != "approved")
+                {
+                    <button class="inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium bg-accent text-accent-foreground hover:bg-accent/90" @onclick='() => SetStatus(Detail.Id, "approved")'>
+                        <i class="fas fa-circle-check h-4 w-4 mr-2"></i>
+                        Approve
+                    </button>
+                }
+            </div>
+            </div>
+        
+    }
+
+    @if (CreateOpen)
+    {
+        @* Backdrop *@
+        <div class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" @onclick="() => CreateOpen = false"></div>
+
+        @* Modal — sits above backdrop, stops clicks propagating to backdrop *@
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+            <div class="w-full max-w-2xl bg-background border border-border rounded-sm shadow-2xl flex flex-col" @onclick:stopPropagation="true">
+
+                @* Header *@
+                <div class="flex items-start justify-between p-6 border-b border-border shrink-0">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-1">
+                            @(Editing is not null ? "Edit Reservation" : "New Reservation")
+                        </p>
+                        <h2 class="font-heading text-2xl text-primary">
+                            @(Editing is not null ? "Update Booking" : "Create Booking")
+                        </h2>
+                        <p class="text-sm text-muted-foreground mt-1">
+                            @(Editing is not null ? "Update the reservation details below." : "Manually create a reservation on behalf of a guest.")
+                        </p>
+                    </div>
+                    <button class="ml-4 shrink-0 inline-flex items-center justify-center rounded-sm h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            @onclick="() => CreateOpen = false" title="Close">
+                        <i class="fas fa-xmark h-4 w-4"></i>
+                    </button>
+                </div>
+
+                @* Scrollable body *@
+                <div class="overflow-y-auto flex-1 p-6">
+                    <div class="space-y-6">
+
+                        @* Section: Listing *@
+                        <div>
+                            <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-3">Listing</p>
+                            <select class="flex h-10 w-full items-center justify-between rounded-sm border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    @bind="Draft.ListingId">
+                                <option value="">Select a listing…</option>
+                                @foreach (var l in Listings)
+                                {
+                                    <option @key="l.Id" value="@l.Id">@l.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        @* Section: Guest details *@
+                        <div>
+                            <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-3">Guest Details</p>
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Full Name <span class="text-destructive">*</span></label>
+                                    <input class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           placeholder="Jane Doe"
+                                           @bind="Draft.GuestName" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Email <span class="text-destructive">*</span></label>
+                                    <input type="email"
+                                           class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           placeholder="jane@example.com"
+                                           @bind="Draft.Email" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Phone</label>
+                                    <input class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           placeholder="+254 700 000 000"
+                                           @bind="Draft.Phone" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Number of Guests</label>
+                                    <input type="number" min="1" max="10"
+                                           class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           @bind="Draft.Guests" />
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Section: Stay dates *@
+                        <div>
+                            <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-3">Stay Dates</p>
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Check-in <span class="text-destructive">*</span></label>
+                                    <input type="date"
+                                           class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           value="@Draft.CheckIn"
+                                           @oninput="e => Draft.CheckIn = e.Value?.ToString() ?? string.Empty" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Check-out <span class="text-destructive">*</span></label>
+                                    <input type="date"
+                                           class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           value="@Draft.CheckOut"
+                                           @oninput="e => Draft.CheckOut = e.Value?.ToString() ?? string.Empty" />
+                                </div>
+                            </div>
+
+                            @* Live nights pill *@
+                            @{
+                                var previewNights = CalculateNights(Draft.CheckIn, Draft.CheckOut);
+                            }
+                            @if (previewNights > 0)
+                            {
+                                <p class="mt-2 text-xs text-muted-foreground">
+                                    <i class="fas fa-moon mr-1 text-accent"></i>
+                                    @previewNights night@(previewNights != 1 ? "s" : "")
+                                </p>
+                            }
+                        </div>
+
+                        @* Section: Billing *@
+                        <div>
+                            <p class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-3">Billing</p>
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Total Amount (KES)</label>
+                                    <input type="number" min="0"
+                                           class="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                           placeholder="0"
+                                           @bind="Draft.TotalAmount" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-foreground mb-1.5">Status</label>
+                                    <select class="flex h-10 w-full items-center justify-between rounded-sm border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                            @bind="Draft.Status">
+                                        <option value="pending">Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="cancelled">Cancelled</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Section: Notes *@
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-3">Notes</label>
+                            <textarea rows="3"
+                                      class="w-full rounded-sm border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                                      placeholder="Internal notes or special requests…"
+                                      @bind="Draft.Notes"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+                @* Footer *@
+                <div class="flex items-center justify-between gap-3 p-6 border-t border-border shrink-0">
+                    <p class="text-xs text-muted-foreground">
+                        Fields marked <span class="text-destructive">*</span> are required
+                    </p>
+                    <div class="flex gap-2">
+                        <button class="inline-flex items-center justify-center rounded-sm border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                                @onclick="() => CreateOpen = false">
+                            Cancel
+                        </button>
+                        <button class="inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium bg-accent text-accent-foreground hover:bg-accent/90 disabled:pointer-events-none disabled:opacity-50 transition-colors"
+                                @onclick="SaveDraft"
+                                disabled="@Saving">
+                            @if (Saving)
+                            {
+                                <i class="fas fa-spinner fa-spin h-4 w-4 mr-2"></i>
+                                @("Saving…")
+                            }
+                            else if (Editing is not null)
+                            {
+                                <i class="fas fa-floppy-disk h-4 w-4 mr-2"></i>
+                                @("Save changes")
+                            }
+                            else
+                            {
+                                <i class="fas fa-plus h-4 w-4 mr-2"></i>
+                                @("Create booking")
+                            }
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Booking> Rows { get; set; } = new();
+    private List<ListingOption> Listings { get; set; } = new();
+    private bool Loading { get; set; } = true;
+    private string StatusFilter { get; set; } = "all";
+    private string Q { get; set; } = string.Empty;
+    private Booking? Detail { get; set; }
+    private bool? Availability { get; set; }
+    private bool CreateOpen { get; set; }
+    private Booking? Editing { get; set; }
+    private DraftBooking Draft { get; set; } = EmptyDraft();
+    private bool Saving { get; set; }
+
+    private static readonly Dictionary<string, string> StatusBadge = new()
+    {
+        ["pending"] = "bg-accent/15 text-accent border-accent/30",
+        ["approved"] = "bg-primary/15 text-primary border-primary/30",
+        ["cancelled"] = "bg-destructive/15 text-destructive border-destructive/30",
+        ["completed"] = "bg-muted text-muted-foreground border-border"
+    };
+
+    private static readonly List<StatusCard> StatusCards = new()
+    {
+        new("all", "All"),
+        new("pending", "Pending"),
+        new("approved", "Approved"),
+        new("cancelled", "Cancelled"),
+        new("completed", "Completed")
+    };
+
+    private static readonly string[] TableHeaders =
+    {
+        "Guest", "Listing", "Dates", "Guests", "Total", "Status", "Actions"
+    };
+
+    private IEnumerable<Booking> Filtered => Rows.Where(r =>
+    {
+        if (StatusFilter != "all" && r.Status != StatusFilter)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(Q))
+        {
+            var s = Q.ToLowerInvariant();
+
+            return r.GuestName.ToLowerInvariant().Contains(s)
+                   || r.Email.ToLowerInvariant().Contains(s)
+                   || (r.ListingId ?? string.Empty).ToLowerInvariant().Contains(s);
+        }
+
+        return true;
+    });
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private void OpenCreate()
+    {
+        Editing = null;
+        Draft = EmptyDraft();
+        CreateOpen = true;
+    }
+
+    private void OpenEdit(Booking b)
+    {
+        Editing = b;
+        Draft = new DraftBooking
+        {
+            ListingId = b.ListingId ?? string.Empty,
+            GuestName = b.GuestName,
+            Email = b.Email,
+            Phone = b.Phone ?? string.Empty,
+            CheckIn = b.CheckIn,
+            CheckOut = b.CheckOut,
+            Guests = b.Guests.ToString(CultureInfo.InvariantCulture),
+            TotalAmount = b.TotalAmount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+            Status = b.Status,
+            Notes = b.Notes ?? string.Empty
+        };
+        CreateOpen = true;
+    }
+
+    private async Task SaveDraft()
+    {
+        if (string.IsNullOrWhiteSpace(Draft.GuestName) || string.IsNullOrWhiteSpace(Draft.Email) || string.IsNullOrWhiteSpace(Draft.CheckIn) || string.IsNullOrWhiteSpace(Draft.CheckOut))
+        {
+            @* NOTE: Replace this with your toast service if you already have one in Blazor. *@
+            return;
+        }
+
+        if (DateTime.Parse(Draft.CheckOut) <= DateTime.Parse(Draft.CheckIn))
+        {
+            @* NOTE: Replace this with your toast service if you already have one in Blazor. *@
+            return;
+        }
+
+        Saving = true;
+
+        var payload = new Booking
+        {
+            Id = Editing?.Id ?? Guid.NewGuid().ToString(),
+            ListingId = string.IsNullOrWhiteSpace(Draft.ListingId) ? null : Draft.ListingId,
+            GuestName = Draft.GuestName.Trim(),
+            Email = Draft.Email.Trim(),
+            Phone = string.IsNullOrWhiteSpace(Draft.Phone) ? null : Draft.Phone.Trim(),
+            CheckIn = Draft.CheckIn,
+            CheckOut = Draft.CheckOut,
+            Guests = int.TryParse(Draft.Guests, out var guests) ? guests : 1,
+            Nights = CalculateNights(Draft.CheckIn, Draft.CheckOut),
+            TotalAmount = decimal.TryParse(Draft.TotalAmount, out var total) ? total : null,
+            Status = Draft.Status,
+            Notes = string.IsNullOrWhiteSpace(Draft.Notes) ? null : Draft.Notes,
+            CreatedAt = Editing?.CreatedAt ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
+        };
+
+        @* NOTE: Supabase client calls from TSX have no direct Blazor equivalent. Inject your booking service here and call create/update. *@
+        if (Editing is not null)
+        {
+            var index = Rows.FindIndex(x => x.Id == Editing.Id);
+            if (index >= 0)
+            {
+                Rows[index] = payload;
+            }
+        }
+        else
+        {
+            Rows.Insert(0, payload);
+        }
+
+        Saving = false;
+        CreateOpen = false;
+        Detail = null;
+
+        await Task.CompletedTask;
+    }
+
+    private async Task Load()
+    {
+        Loading = true;
+
+        Listings = ApartmentData.Apartments
+            .Select(a => new ListingOption { Id = a.Id.ToString(), Name = a.Name })
+            .ToList();
+
+        @* NOTE: Replace Rows with your Blazor data service or Supabase API endpoint when ready. *@
+        Rows = new List<Booking>();
+
+        Loading = false;
+        await Task.CompletedTask;
+    }
+
+    private async Task SetStatus(string id, string status)
+    {
+        var row = Rows.FirstOrDefault(r => r.Id == id);
+
+        if (row is not null)
+        {
+            row.Status = status;
+
+            if (Detail?.Id == id)
+            {
+                Detail.Status = status;
+            }
+        }
+
+        @* NOTE: Persist this status update using your Blazor data service. *@
+        await Task.CompletedTask;
+    }
+
+    private async Task Remove(string id)
+    {
+        Rows.RemoveAll(r => r.Id == id);
+
+        if (Detail?.Id == id)
+        {
+            Detail = null;
+        }
+
+        @* NOTE: Browser confirm() from TSX should be replaced with JS interop if confirmation is required. *@
+        @* NOTE: Persist this delete using your Blazor data service. *@
+        await Task.CompletedTask;
+    }
+
+    private async Task CheckAvailability(Booking b)
+    {
+        if (string.IsNullOrWhiteSpace(b.ListingId))
+        {
+            Availability = null;
+            return;
+        }
+
+        @* NOTE: Replace this with your check_listing_availability API/service call. *@
+        Availability = true;
+        await Task.CompletedTask;
+    }
+
+    private void OpenDetail(Booking booking)
+    {
+        Detail = booking;
+        Availability = null;
+    }
+
+    private void CloseDetail()
+    {
+        Detail = null;
+    }
+
+    private string NameFor(string? id)
+    {
+        return Listings.FirstOrDefault(l => l.Id == id)?.Name ?? id ?? "—";
+    }
+
+    private int GetCount(string key)
+    {
+        return key switch
+        {
+            "all" => Rows.Count,
+            "pending" => Rows.Count(r => r.Status == "pending"),
+            "approved" => Rows.Count(r => r.Status == "approved"),
+            "cancelled" => Rows.Count(r => r.Status == "cancelled"),
+            "completed" => Rows.Count(r => r.Status == "completed"),
+            _ => 0
+        };
+    }
+
+    private static string FormatDate(string value, string format)
+    {
+        return DateTime.TryParse(value, out var date)
+            ? date.ToString(format, CultureInfo.InvariantCulture)
+            : value;
+    }
+
+    private static int CalculateNights(string checkIn, string checkOut)
+    {
+        if (!DateTime.TryParse(checkIn, out var start) || !DateTime.TryParse(checkOut, out var end))
+        {
+            return 0;
+        }
+
+        return Math.Max(0, (end.Date - start.Date).Days);
+    }
+
+    private static DraftBooking EmptyDraft()
+    {
+        return new DraftBooking
+        {
+            ListingId = string.Empty,
+            GuestName = string.Empty,
+            Email = string.Empty,
+            Phone = string.Empty,
+            CheckIn = string.Empty,
+            CheckOut = string.Empty,
+            Guests = "1",
+            TotalAmount = string.Empty,
+            Status = "pending",
+            Notes = string.Empty
+        };
+    }
+
+    private sealed record StatusCard(string Key, string Label);
+
+    private sealed class ListingOption
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    private sealed class DraftBooking
+    {
+        public string ListingId { get; set; } = string.Empty;
+        public string GuestName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string CheckIn { get; set; } = string.Empty;
+        public string CheckOut { get; set; } = string.Empty;
+        public string Guests { get; set; } = "1";
+        public string TotalAmount { get; set; } = string.Empty;
+        public string Status { get; set; } = "pending";
+        public string Notes { get; set; } = string.Empty;
+    }
+
+    private sealed class Booking
+    {
+        public string Id { get; set; } = string.Empty;
+        public string? ListingId { get; set; }
+        public string GuestName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Phone { get; set; }
+        public string CheckIn { get; set; } = string.Empty;
+        public string CheckOut { get; set; } = string.Empty;
+        public int Guests { get; set; }
+        public int Nights { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public string Status { get; set; } = "pending";
+        public string? Notes { get; set; }
+        public string CreatedAt { get; set; } = string.Empty;
+    }
+}
